@@ -158,6 +158,12 @@ function Resilience() {
       end: () => '+=' + window.innerHeight * last,
       pin: true,
       scrub: 0.5,
+      snap: {
+        snapTo: 1 / last,
+        duration: { min: 0.2, max: 0.5 },
+        delay: 0.05,
+        ease: 'power1.inOut',
+      },
       invalidateOnRefresh: true,
       refreshPriority: 1,
       onUpdate: (self) => {

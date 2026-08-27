@@ -563,7 +563,13 @@ function Pillars() {
   }, [active])
 
   useEffect(() => {
-    if (active !== 0) return
+    // Switching away from EXPERTISE removes this section's pin (and its
+    // pin-spacer) below — force a refresh so downstream pinned sections
+    // (Resilience) re-measure their start/end instead of using stale positions.
+    if (active !== 0) {
+      ScrollTrigger.refresh()
+      return
+    }
     const mm = gsap.matchMedia()
     mm.add(`(min-width: ${parseInt(GRID.BREAKPOINT, 10) + 1}px)`, () => {
       const distance = () => {
@@ -586,6 +592,9 @@ function Pillars() {
       })
       return () => st.kill()
     })
+    // Inserting this pin's spacer shifts everything below it; refresh so
+    // Resilience picks up the new layout.
+    ScrollTrigger.refresh()
     return () => mm.revert()
   }, [active])
 
