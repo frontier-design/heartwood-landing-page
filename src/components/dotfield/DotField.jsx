@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import styled from 'styled-components'
-import p5 from 'p5'
 import { DotFieldEngine } from './dotFieldEngine.js'
 
 // ─── DotField ────────────────────────────────────────────────────────────────
@@ -77,8 +76,14 @@ function DotField(
     })
     engineRef.current = engine
 
+    let instance
+    let ro
+    let io
+    let cancelled = false
+
     const sketch = (p) => {
       p.setup = () => {
+        p.pixelDensity(1)
         p.createCanvas(host.offsetWidth, host.offsetHeight)
         p.noStroke()
         engine.init(p, p.width, p.height)
@@ -105,21 +110,39 @@ function DotField(
       }
     }
 
-    const instance = new p5(sketch, host)
-    p5Ref.current = instance
+    // p5 is heavy (~900KB); load it off the critical path so the page renders
+    // before the canvases hydrate.
+    import('p5').then(({ default: p5 }) => {
+      if (cancelled || !host) return
+      instance = new p5(sketch, host)
+      p5Ref.current = instance
 
-    const ro = new ResizeObserver((entries) => {
-      const rect = entries[0].contentRect
-      if (rect.width > 0 && rect.height > 0) {
-        instance.resizeCanvas(rect.width, rect.height)
-        engine.resize(instance, rect.width, rect.height)
-      }
+      ro = new ResizeObserver((entries) => {
+        const rect = entries[0].contentRect
+        if (rect.width > 0 && rect.height > 0) {
+          instance.resizeCanvas(rect.width, rect.height)
+          engine.resize(instance, rect.width, rect.height)
+        }
+      })
+      ro.observe(host)
+
+      // Only run the draw loop while the field is on (or near) screen — keeps
+      // off-screen sketches from animating hundreds of dots for nothing.
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) instance.loop()
+          else instance.noLoop()
+        },
+        { rootMargin: '200px' },
+      )
+      io.observe(host)
     })
-    ro.observe(host)
 
     return () => {
-      ro.disconnect()
-      instance.remove()
+      cancelled = true
+      io?.disconnect()
+      ro?.disconnect()
+      instance?.remove()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
