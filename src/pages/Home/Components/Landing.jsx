@@ -94,12 +94,19 @@ function Landing() {
     })
 
     // GSAP freezes the pinned Frame's pixel size and only recalculates it on a
-    // debounced refresh (after resizing stops), which stalls the DotField's
-    // ResizeObserver. Refresh immediately so the canvas rescales live.
-    const onResize = () => ScrollTrigger.refresh()
+    // debounced refresh, which stalls the DotField's ResizeObserver. The
+    // DotField's own ResizeObserver rescales the canvas live during the drag;
+    // we only defer the expensive cross-trigger refresh to when resizing stops
+    // so a drag isn't a storm of full-layout recalcs.
+    let refreshTimer
+    const onResize = () => {
+      clearTimeout(refreshTimer)
+      refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 150)
+    }
     window.addEventListener('resize', onResize)
 
     return () => {
+      clearTimeout(refreshTimer)
       window.removeEventListener('resize', onResize)
       st.kill()
     }

@@ -510,8 +510,8 @@ const InfoCard = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  transform: ${(p) => CARD_TRANSFORMS[p.$card][p.$show ? 'show' : 'hide']};
-  opacity: ${(p) => (p.$show ? 1 : 0)};
+  transform: ${(p) => CARD_TRANSFORMS[p.$card].hide};
+  opacity: 0;
   transition:
     opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -545,7 +545,6 @@ const CardDesc = styled.p`
 
 function Pillars() {
   const [active, setActive] = useState(0)
-  const [hoveredInno, setHoveredInno] = useState(null)
   const tab = TABS[active]
 
   const sectionRef = useRef(null)
@@ -557,6 +556,7 @@ function Pillars() {
   const innoFieldRef = useRef(null)
   const markerRefs = useRef([])
   const innoLabelRefs = useRef([])
+  const infoCardRefs = useRef([])
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
@@ -668,6 +668,20 @@ function Pillars() {
     if (el) el.style.opacity = '0'
   }
 
+  const showCard = (i, card) => {
+    const el = infoCardRefs.current[i]
+    if (!el) return
+    el.style.opacity = '1'
+    el.style.transform = CARD_TRANSFORMS[card].show
+  }
+
+  const hideCard = (i, card) => {
+    const el = infoCardRefs.current[i]
+    if (!el) return
+    el.style.opacity = '0'
+    el.style.transform = CARD_TRANSFORMS[card].hide
+  }
+
   return (
     <Section ref={sectionRef}>
       <Layout>
@@ -759,8 +773,8 @@ function Pillars() {
                         <Marker
                           key={m.key}
                           ref={(el) => (markerRefs.current[i] = el)}
-                          onMouseEnter={() => setHoveredInno(i)}
-                          onMouseLeave={() => setHoveredInno(null)}
+                          onMouseEnter={() => showCard(i, m.card)}
+                          onMouseLeave={() => hideCard(i, m.card)}
                         >
                           <MarkerLabel ref={(el) => (innoLabelRefs.current[i] = el)}>
                             {m.lines.map((line, j) => (
@@ -771,7 +785,7 @@ function Pillars() {
                             ))}
                           </MarkerLabel>
                           <MarkerHit />
-                          <InfoCard $card={m.card} $show={hoveredInno === i}>
+                          <InfoCard $card={m.card} ref={(el) => (infoCardRefs.current[i] = el)}>
                             <CardImage $image={m.image} />
                             <CardTitle>{m.key}</CardTitle>
                             <CardDesc>{m.desc}</CardDesc>

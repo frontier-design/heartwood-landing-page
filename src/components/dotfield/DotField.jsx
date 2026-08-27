@@ -81,6 +81,17 @@ function DotField(
     let io
     let cancelled = false
 
+    // Cache parsed hex→rgb so per-dot anchor colours aren't re-parsed every frame.
+    const rgbCache = new Map()
+    const parseRgb = (hex) => {
+      let c = rgbCache.get(hex)
+      if (!c) {
+        c = hexToRgb(hex)
+        rgbCache.set(hex, c)
+      }
+      return c
+    }
+
     const sketch = (p) => {
       p.setup = () => {
         p.pixelDensity(1)
@@ -94,16 +105,16 @@ function DotField(
         if (bg == null) {
           p.clear()
         } else {
-          const c = hexToRgb(bg)
+          const c = parseRgb(bg)
           p.background(c.r, c.g, c.b)
         }
 
         engine.update(p)
 
-        const base = hexToRgb(dotColorRef.current)
+        const base = parseRgb(dotColorRef.current)
         for (const d of engine.dots) {
           if (d.alpha <= 0 || d.diam <= 0) continue
-          const c = d.color ? hexToRgb(d.color) : base
+          const c = d.color ? parseRgb(d.color) : base
           p.fill(c.r, c.g, c.b, d.alpha)
           p.circle(d.x + d.nudgeX + d.driftX, d.y + d.nudgeY + d.driftY, d.diam)
         }

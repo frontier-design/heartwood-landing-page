@@ -371,8 +371,25 @@ export class DotFieldEngine {
   _applyCursor(p) {
     const mx = p.mouseX
     const my = p.mouseY
-    const rad = CURSOR_INFLUENCE_RADIUS
     const ease = CURSOR_NUDGE_EASE
+
+    // When the cursor is off-canvas it can't push any dot, so skip the O(N)
+    // distance test entirely and just relax existing nudges back to rest.
+    const rad = CURSOR_INFLUENCE_RADIUS
+    if (mx < -rad || mx > this.w + rad || my < -rad || my > this.h + rad) {
+      if (this._cursorAtRest) return
+      let moving = false
+      for (const d of this.dots) {
+        d.nudgeX += -d.nudgeX * ease
+        d.nudgeY += -d.nudgeY * ease
+        if (Math.abs(d.nudgeX) > 0.01 || Math.abs(d.nudgeY) > 0.01) moving = true
+        else { d.nudgeX = 0; d.nudgeY = 0 }
+      }
+      this._cursorAtRest = !moving
+      return
+    }
+
+    this._cursorAtRest = false
     for (const d of this.dots) {
       const nvx = d.x - mx
       const nvy = d.y - my
