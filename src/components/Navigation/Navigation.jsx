@@ -153,6 +153,10 @@ function Navigation() {
       start: 0,
       end: 'max',
       onUpdate: (self) => {
+        // A refresh (e.g. Pillars inserting/removing its pin-spacer on a tab
+        // switch) restores scroll position, which reads as an upward scroll and
+        // would wrongly reveal the nav over the content. Ignore those.
+        if (ScrollTrigger.isRefreshing) return
         if (self.scroll() <= SHRINK_DISTANCE) {
           showAnim.play()
           return

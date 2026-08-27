@@ -549,6 +549,8 @@ function Pillars() {
 
   const sectionRef = useRef(null)
   const scrollRef = useRef(null)
+  const stRef = useRef(null)
+  const distanceRef = useRef(0)
   const photoRef = useRef(null)
   const intelFieldRef = useRef(null)
   const intelLabelRefs = useRef([])
@@ -559,22 +561,19 @@ function Pillars() {
   const infoCardRefs = useRef([])
 
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = 0
+    const el = scrollRef.current
+    if (!el) return
+    const st = stRef.current
+    el.scrollTop = st ? st.progress * distanceRef.current : 0
   }, [active])
 
   useEffect(() => {
-    // Switching away from EXPERTISE removes this section's pin (and its
-    // pin-spacer) below — force a refresh so downstream pinned sections
-    // (Resilience) re-measure their start/end instead of using stale positions.
-    if (active !== 0) {
-      ScrollTrigger.refresh()
-      return
-    }
     const mm = gsap.matchMedia()
     mm.add(`(min-width: ${parseInt(GRID.BREAKPOINT, 10) + 1}px)`, () => {
       const distance = () => {
         const el = scrollRef.current
-        return el ? el.scrollHeight - el.clientHeight : 0
+        if (el) distanceRef.current = el.scrollHeight - el.clientHeight
+        return distanceRef.current
       }
       const st = ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -587,16 +586,17 @@ function Pillars() {
         refreshPriority: 2,
         onUpdate: (self) => {
           const el = scrollRef.current
-          if (el) el.scrollTop = self.progress * distance()
+          if (el) el.scrollTop = self.progress * distanceRef.current
         },
       })
-      return () => st.kill()
+      stRef.current = st
+      return () => {
+        st.kill()
+        stRef.current = null
+      }
     })
-    // Inserting this pin's spacer shifts everything below it; refresh so
-    // Resilience picks up the new layout.
-    ScrollTrigger.refresh()
     return () => mm.revert()
-  }, [active])
+  }, [])
 
   useEffect(() => {
     if (active !== 1) return
