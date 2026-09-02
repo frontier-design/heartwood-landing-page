@@ -24,6 +24,7 @@ const Host = styled.div`
 
   canvas {
     display: block;
+    touch-action: auto !important;
   }
 `
 
