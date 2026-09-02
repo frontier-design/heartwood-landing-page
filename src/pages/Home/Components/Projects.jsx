@@ -25,6 +25,10 @@ const PROJECTS = [
 
 const INITIAL = 0
 
+// The row height doubles as the active item's width so it expands to a 1/1
+// square (less horizontal cropping — you see more of the image).
+const ROW_H = 'clamp(34rem, 88vh, 64rem)'
+
 const Section = styled.section`
   position: relative;
   width: 100vw;
@@ -43,7 +47,7 @@ const Layout = styled(Grid)`
 // Contained in the grid (cols 1 → 12), no longer a viewport full-bleed.
 const Row = styled(GridCell)`
   display: flex;
-  height: clamp(34rem, 88vh, 64rem);
+  height: ${ROW_H};
   overflow: hidden;
 
   @media ${GRID.MEDIA_MOBILE} {
@@ -54,13 +58,26 @@ const Row = styled(GridCell)`
 
 const Item = styled.div`
   position: relative;
-  flex-grow: ${(p) => (p.$active ? 5 : 1)};
-  flex-shrink: 1;
-  flex-basis: 0;
+  /* Active item: fixed width == row height → a 1/1 square. Inactive items
+     share the remaining space. Animating flex-basis + flex-grow keeps the
+     expansion smooth. */
+  flex-grow: ${(p) => (p.$active ? 0 : 1)};
+  flex-shrink: ${(p) => (p.$active ? 0 : 1)};
+  flex-basis: ${(p) => (p.$active ? ROW_H : '0')};
   min-width: 0;
   overflow: hidden;
   cursor: pointer;
-  transition: flex-grow 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    flex-basis 1s cubic-bezier(0.16, 1, 0.3, 1),
+    flex-grow 1s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Below 1050px drop the square rule and fall back to proportional widths. */
+  @media (max-width: 1050px) {
+    flex-grow: ${(p) => (p.$active ? 5 : 1)};
+    flex-shrink: 1;
+    flex-basis: 0;
+    transition: flex-grow 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
   /* The image lives on a layer inset 5px above the top; the parent's
      overflow:hidden clips that top strip (crop 5px off the top) while

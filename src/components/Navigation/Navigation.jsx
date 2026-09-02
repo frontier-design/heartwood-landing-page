@@ -254,6 +254,8 @@ function Navigation() {
             <MenuLink
               key={label}
               href={href ?? (target ? `#${target}` : '#')}
+              target={href ? '_blank' : undefined}
+              rel={href ? 'noopener noreferrer' : undefined}
               onClick={(e) => scrollToTarget(e, target)}
             >
               {label}
@@ -280,6 +282,8 @@ function Navigation() {
                   <NavLink
                     key={label}
                     href={href ?? (target ? `#${target}` : '#')}
+                    target={href ? '_blank' : undefined}
+                    rel={href ? 'noopener noreferrer' : undefined}
                     onClick={(e) => scrollToTarget(e, target)}
                   >
                     {label}

@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, freightBody, colors } from '../../../themes.js'
 import { DotField } from '../../../components/dotfield'
+import expertiseImage from '../../../assets/images/expertise-image.webp'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -75,6 +76,17 @@ const Field = styled.div`
   z-index: 0;
 `
 
+// The EXPERTISE panel no longer carries a dot canvas — it sits on a full-bleed
+// background image instead.
+const BgImage = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url(${(p) => p.$image});
+  background-size: cover;
+  background-position: center;
+`
+
 // Text sits above the canvas; pointer-events pass through to the canvas so the
 // hover repel works across the whole panel, not just outside the text column.
 const Content = styled(Grid)`
@@ -96,7 +108,7 @@ const Eyebrow = styled.p`
   line-height: 1.2;
   white-space: nowrap;
   margin: 0 0 clamp(1rem, 2.5vh, 1.75rem);
-  color: ${colors.teal};
+  color: ${(p) => (p.$dark ? colors.white : colors.teal)};
 `
 
 const Heading = styled.h2`
@@ -111,25 +123,29 @@ const Body = styled.p`
   color: ${colors.white};
 `
 
-function Panel({ eyebrow, heading, body, dark, top, layerRef, fieldRef }) {
+function Panel({ eyebrow, heading, body, dark, top, layerRef, fieldRef, image }) {
   return (
     <Layer ref={layerRef} $dark={dark} $top={top}>
-      <Field>
-        <DotField
-          ref={fieldRef}
-          states={STATES}
-          seed={FIELD_SEED}
-          count={60}
-          dotColor={DOT_COLOR}
-          dotDiameter={10}
-          wander={false}
-          cursor
-          drift={0}
-        />
-      </Field>
+      {image ? (
+        <BgImage $image={image} />
+      ) : (
+        <Field>
+          <DotField
+            ref={fieldRef}
+            states={STATES}
+            seed={FIELD_SEED}
+            count={60}
+            dotColor={DOT_COLOR}
+            dotDiameter={10}
+            wander={false}
+            cursor
+            drift={0}
+          />
+        </Field>
+      )}
       <Content>
         <Column $start={1} $span={5} $spanTablet={6} $spanMobile={4}>
-          <Eyebrow>{eyebrow}</Eyebrow>
+          <Eyebrow $dark={dark}>{eyebrow}</Eyebrow>
           <Heading $dark={dark}>{heading}</Heading>
           {body && <Body>{body}</Body>}
         </Column>
@@ -141,7 +157,6 @@ function Panel({ eyebrow, heading, body, dark, top, layerRef, fieldRef }) {
 function Approach() {
   const trackRef = useRef(null)
   const topRef = useRef(null)
-  const darkFieldRef = useRef(null)
   const topFieldRef = useRef(null)
 
   useEffect(() => {
@@ -155,9 +170,7 @@ function Approach() {
         // uncovering the dark layer beneath it. No opacity, just a clip wipe.
         const cut = self.progress * 100
         if (topRef.current) topRef.current.style.clipPath = `inset(0 0 ${cut}% 0)`
-        // Same progress drives both fields from scatter into the three rings.
-        // Seeded identically, so the two canvases stay in lockstep across the wipe.
-        darkFieldRef.current?.seek(self.progress)
+        // Progress drives the resilient-approach field from scatter into rings.
         topFieldRef.current?.seek(self.progress)
       },
     })
@@ -170,10 +183,10 @@ function Approach() {
       <Section>
         <Panel
           dark
-          fieldRef={darkFieldRef}
+          image={expertiseImage}
           eyebrow="EXPERTISE"
-          heading="Heartwood was founded by two industry leaders with a proven track record, having overseen billions of dollars in real estate transactions."
-          body="They’ve built a diverse team of interdisciplinary experts united by one goal: maximizing wealth creation for our investors."
+          heading="Vertically integrated, carrying every asset from acquisition to disposition."
+          body="The platform was built on a simple belief: a vertically integrated team across working modalities reduces risk. No information is lost at the hand-off between asset phases because every transition is supported by our intelligence and information approach. One team carries every decision through the asset’s full ownership life cycle."
         />
         <Panel
           top
