@@ -14,17 +14,33 @@ const Overlay = styled.div`
   transition: opacity 0.6s ease;
 `
 
-// Collect every image the page has rendered so far: <img> sources plus any
-// CSS background-image url() (the webp section backgrounds use these).
+export const REVEAL_EVENT = 'heartwood:revealed'
+
+function inViewport(el) {
+  const r = el.getBoundingClientRect()
+  return (
+    r.width > 0 &&
+    r.height > 0 &&
+    r.bottom > 0 &&
+    r.right > 0 &&
+    r.top < window.innerHeight &&
+    r.left < window.innerWidth
+  )
+}
+
+// Collect the images the user will actually see at reveal: <img> sources and
+// CSS background-image url()s, but only on elements intersecting the initial
+// viewport. Gating on every image on the page held the overlay up until all
+// section backgrounds (~11MB) had decoded.
 function collectImageUrls() {
   const urls = new Set()
   document.querySelectorAll('img').forEach((img) => {
     const src = img.currentSrc || img.src
-    if (src) urls.add(src)
+    if (src && inViewport(img)) urls.add(src)
   })
   document.querySelectorAll('*').forEach((el) => {
     const bg = getComputedStyle(el).backgroundImage
-    if (bg && bg !== 'none') {
+    if (bg && bg !== 'none' && inViewport(el)) {
       for (const m of bg.matchAll(/url\((['"]?)(.*?)\1\)/g)) urls.add(m[2])
     }
   })
@@ -49,21 +65,18 @@ function Loader() {
 
   useEffect(() => {
     let cancelled = false
+    let revealed = false
     const reveal = () => {
-      if (!cancelled) setLoaded(true)
+      if (cancelled || revealed) return
+      revealed = true
+      setLoaded(true)
+      window.dispatchEvent(new Event(REVEAL_EVENT))
     }
 
-    // Wait for the things that actually make the page presentable:
-    //  1. web fonts (PP Frama / mono / freight) so text doesn't reflow,
-    //  2. the p5 chunk (~900KB, dynamically imported by DotField) so the
-    //     canvases hydrate the instant we reveal instead of popping in,
-    //  3. all currently-rendered images decoded (webp section backgrounds).
     const ready = Promise.all([
       document.fonts?.ready ?? Promise.resolve(),
       import('p5').catch(() => {}),
       new Promise((resolve) => {
-        // Let React commit + paint so the images/backgrounds exist in the DOM,
-        // then preload/decode them all.
         requestAnimationFrame(() =>
           requestAnimationFrame(async () => {
             await Promise.all(collectImageUrls().map(preloadImage))
@@ -74,7 +87,7 @@ function Loader() {
     ])
 
     // Safety cap: never trap the user behind the overlay if an asset stalls.
-    const safety = setTimeout(reveal, 8000)
+    const safety = setTimeout(reveal, 4000)
     ready.then(() => {
       clearTimeout(safety)
       reveal()
