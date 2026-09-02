@@ -18,7 +18,10 @@ const LINKS = [
   { label: 'PROPERTIES', target: 'properties' },
   { label: 'INVESTMENT', target: 'investment' },
   { label: 'OUR TEAM', target: 'team' },
-  { label: 'INVESTOR PORTAL', target: null },
+  {
+    label: 'INVESTOR PORTAL',
+    href: 'https://heartwoodsgggfsicom.ciamlogin.com/d1d21c5a-41d2-4232-a196-0483e5082721/oauth2/v2.0/authorize?client_id=cdecab2f-ecd9-451b-bee0-784b42d0498a&redirect_uri=https%3A%2F%2Fheartwood.sgggfsi.com%2Fsign-in-oidc_d1d21c5a-41d2-4232-a196-0483e5082721&response_type=code&scope=openid%20profile%20email%20offline_access&code_challenge=PMPjW27_OwO3JFYTzgCnaAtHWu0n2qyBgVXsjxyhZyc&code_challenge_method=S256&response_mode=form_post&nonce=639239595642975394.OGVjY2RiODUtMzc0Yy00OWQxLTg5YzQtZDQ5NDM2NTAyNTM4NGI2NzRlMzgtOTgxYy00MDQ0LWExZjItOWE2NDQ4NDhhOGQz&client_info=1&x-client-brkrver=IDWeb.3.9.3.0&state=CfDJ8GQBORmZIItNsEoqjvSke39NhuXa9xzxaV-PhJkfWOjz6kHGpxBXW-pD_P2ncSXIc54MKaIHT0-oHERC1DNlGEKWjQeQopJ3yHbWWQD0IYNfhRV-O3T7rGkYFjb7HHtRrTagHrsa-vdkkLNcuIYQ-XjCu5PnAATijlzFJHc2WGlYHqCHTtxUOa_-eH0cdTedyz1PLc1mlB9lreu5BRkmRlNM2NMmPeXXSogSuvGMmNlYYOoRog2fQBf_DyCg1RO7IeEzoOFBAl_xLNsR_ZohY18jmMQgRr4wx-q0rNvooM3DupFEvB21NiYaTgJg-aEVl4Hci91f1iUvd-oVg-xl6xn3ehZt-8zBLPmwN7_f6ztXs5Lnj1jcaHk0Dl665ZnFZSqZbMejVQ9I1bxpAQhECG7Edd-hdBVtlJ4cz_dcQ1-ZUWuoan8D0bx6_NqNMTsCriiIiAUye7V9ggXqhh8k-VdTwzgBnu0lVrXsTqf0_P44bQI9J8MntJYEhFdStlVT4Q&x-client-SKU=ID_NET8_0&x-client-ver=8.12.0.0',
+  },
 ]
 
 const NavBar = styled.nav`
@@ -139,8 +142,7 @@ function Navigation() {
   const menuRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Smooth-scroll to a section anchor; links without a target (Investor Portal)
-  // fall through to their default behaviour.
+  // Smooth-scroll to in-page section anchors; external hrefs navigate normally.
   const scrollToTarget = (e, target) => {
     if (!target) return
     e.preventDefault()
@@ -248,10 +250,10 @@ function Navigation() {
     <>
       <MenuPanel $open={menuOpen}>
         <MenuLinks>
-          {LINKS.map(({ label, target }) => (
+          {LINKS.map(({ label, target, href }) => (
             <MenuLink
               key={label}
-              href={target ? `#${target}` : '#'}
+              href={href ?? (target ? `#${target}` : '#')}
               onClick={(e) => scrollToTarget(e, target)}
             >
               {label}
@@ -274,10 +276,10 @@ function Navigation() {
                 }}
               />
               <Links ref={linksRef}>
-                {LINKS.map(({ label, target }) => (
+                {LINKS.map(({ label, target, href }) => (
                   <NavLink
                     key={label}
-                    href={target ? `#${target}` : '#'}
+                    href={href ?? (target ? `#${target}` : '#')}
                     onClick={(e) => scrollToTarget(e, target)}
                   >
                     {label}

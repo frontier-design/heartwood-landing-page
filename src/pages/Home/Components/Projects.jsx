@@ -94,8 +94,13 @@ const Info = styled.div`
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: clamp(1.5rem, 3vw, 3rem);
-  background-color: ${colors.black};
+  padding: clamp(4rem, 12vh, 8rem) clamp(1.5rem, 3vw, 3rem) clamp(1.35rem, 2.7vw, 2.7rem);
+  background: linear-gradient(
+    to top,
+    rgba(33, 33, 33, 0.97) 0%,
+    rgba(33, 33, 33, 0.72) 45%,
+    rgba(33, 33, 33, 0) 100%
+  );
   opacity: ${(p) => (p.$active ? 1 : 0)};
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.3s' : '0s')};
   pointer-events: none;
@@ -126,7 +131,7 @@ const Location = styled.p`
 const Status = styled.p`
   ${monoCallout}
   margin: clamp(0.35rem, 0.8vh, 0.6rem) 0 0;
-  color: ${colors.rust};
+  color: ${colors.gold};
   opacity: ${(p) => (p.$active ? 1 : 0)};
   transform: translateY(${(p) => (p.$active ? '0' : '1rem')});
   transition:
@@ -142,7 +147,7 @@ const Status = styled.p`
 
 const Name = styled.h3`
   ${displayHeading}
-  margin: clamp(2.5rem, 7vh, 4.5rem) 0 0;
+  margin: clamp(0.5rem, 1.5vh, 1rem) 0 0;
   text-transform: uppercase;
   color: ${colors.white};
   opacity: ${(p) => (p.$active ? 1 : 0)};
@@ -152,7 +157,7 @@ const Name = styled.h3`
     transform ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.65s' : '0s')};
 
   @media ${GRID.MEDIA_MOBILE} {
-    margin-top: clamp(1.5rem, 4vh, 2.5rem);
+    margin-top: clamp(0.4rem, 1.2vh, 0.75rem);
     opacity: 1;
     transform: none;
     transition: none;
