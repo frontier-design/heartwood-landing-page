@@ -15,6 +15,9 @@ const Section = styled.section`
   height: 200vh;
 `
 
+/* Sticks for the first viewport of the 200vh Section while the field animates.
+   Sticky (compositor-driven) instead of a GSAP pin — see the note in
+   Resilience.jsx. */
 const Frame = styled.div`
   position: sticky;
   top: 0;
@@ -22,7 +25,6 @@ const Frame = styled.div`
   height: 100vh;
   height: 100dvh;
   overflow: clip;
-  background-color: ${colors.black};
   background-image: url(${landingImage});
   background-size: cover;
   background-position: center;
