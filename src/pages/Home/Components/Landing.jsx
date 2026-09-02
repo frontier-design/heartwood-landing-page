@@ -15,13 +15,14 @@ const Section = styled.section`
   height: 200vh;
 `
 
+/* Sticks for the first viewport of the 200vh Section while the field animates.
+   Sticky (compositor-driven) instead of a GSAP pin — see the note in
+   Resilience.jsx. */
 const Frame = styled.div`
-  position: relative;
+  position: sticky;
+  top: 0;
   width: 100vw;
-  /* +1px overscan: this Frame is GSAP-pinned as position:fixed at one viewport
-     tall; the extra pixel prevents a ≤1px subpixel gap at the bottom edge, and
-     overflow:clip hides it below the fold. See the note in Resilience.jsx. */
-  height: calc(100vh + 1px);
+  height: 100vh;
   overflow: clip;
   background-image: url(${landingImage});
   background-size: cover;
@@ -106,7 +107,6 @@ const STATES = [
 
 function Landing() {
   const sectionRef = useRef(null)
-  const frameRef = useRef(null)
   const fieldRef = useRef(null)
 
   useEffect(() => {
@@ -114,38 +114,18 @@ function Landing() {
       trigger: sectionRef.current,
       start: 'top top',
       end: 'bottom bottom',
-      pin: frameRef.current,
-      pinSpacing: false,
       scrub: 0.3,
       onUpdate: (self) => {
         if (self.progress > 0) fieldRef.current?.seek(self.progress)
       },
     })
 
-    // The pin freezes the Frame's pixel size, so the DotField's ResizeObserver
-    // can't see the viewport change until ScrollTrigger recomputes the pin. We
-    // refresh live, throttled to one call per animation frame, so the canvas
-    // tracks the window while dragging instead of snapping only after you stop.
-    let raf = 0
-    const onResize = () => {
-      if (raf) return
-      raf = requestAnimationFrame(() => {
-        raf = 0
-        ScrollTrigger.refresh()
-      })
-    }
-    window.addEventListener('resize', onResize)
-
-    return () => {
-      if (raf) cancelAnimationFrame(raf)
-      window.removeEventListener('resize', onResize)
-      st.kill()
-    }
+    return () => st.kill()
   }, [])
 
   return (
     <Section ref={sectionRef}>
-      <Frame ref={frameRef}>
+      <Frame>
         <Hero>
           <Field>
             <DotField

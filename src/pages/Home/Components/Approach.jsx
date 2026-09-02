@@ -32,13 +32,23 @@ const STATES = [
 // both are seeked to the same scroll progress, so they read as one field.
 const FIELD_SEED = 20240813
 
-const Section = styled.section`
+/* Two viewports of scroll: the Section sticks for the first one while the wipe
+   plays. Sticky (compositor-driven) instead of a GSAP pin — see the note in
+   Resilience.jsx. Dark background so any subpixel seam at the end matches the
+   uncovered dark panel. */
+const Track = styled.div`
   position: relative;
+  height: calc(100vh * 2);
+  height: calc(100lvh * 2);
+  background-color: ${colors.black};
+`
+
+const Section = styled.section`
+  position: sticky;
+  top: 0;
   width: 100vw;
-  /* +1px overscan for the pinned (position:fixed) cover — prevents a ≤1px
-     subpixel gap at the bottom edge. See the note in Resilience.jsx. */
-  height: calc(100vh + 1px);
-  height: calc(100lvh + 1px);
+  height: 100vh;
+  height: 100lvh;
   overflow: clip;
 `
 
@@ -129,17 +139,16 @@ function Panel({ eyebrow, heading, body, dark, top, layerRef, fieldRef }) {
 }
 
 function Approach() {
-  const sectionRef = useRef(null)
+  const trackRef = useRef(null)
   const topRef = useRef(null)
   const darkFieldRef = useRef(null)
   const topFieldRef = useRef(null)
 
   useEffect(() => {
     const st = ScrollTrigger.create({
-      trigger: sectionRef.current,
+      trigger: trackRef.current,
       start: 'top top',
-      end: () => '+=' + window.innerHeight,
-      pin: true,
+      end: 'bottom bottom',
       scrub: 0.5,
       onUpdate: (self) => {
         // Shrink the light layer from the bottom (its bottom inset grows 0→100%),
@@ -157,22 +166,24 @@ function Approach() {
   }, [])
 
   return (
-    <Section id="approach" ref={sectionRef}>
-      <Panel
-        dark
-        fieldRef={darkFieldRef}
-        eyebrow="EXPERTISE"
-        heading="Heartwood was founded by two industry leaders with a proven track record, having overseen billions of dollars in real estate transactions."
-        body="They’ve built a diverse team of interdisciplinary experts united by one goal: maximizing wealth creation for our investors."
-      />
-      <Panel
-        top
-        layerRef={topRef}
-        fieldRef={topFieldRef}
-        eyebrow="A RESILIENT APPROACH"
-        heading="Responsive intelligence and systems-level real estate innovations."
-      />
-    </Section>
+    <Track id="approach" ref={trackRef}>
+      <Section>
+        <Panel
+          dark
+          fieldRef={darkFieldRef}
+          eyebrow="EXPERTISE"
+          heading="Heartwood was founded by two industry leaders with a proven track record, having overseen billions of dollars in real estate transactions."
+          body="They’ve built a diverse team of interdisciplinary experts united by one goal: maximizing wealth creation for our investors."
+        />
+        <Panel
+          top
+          layerRef={topRef}
+          fieldRef={topFieldRef}
+          eyebrow="A RESILIENT APPROACH"
+          heading="Responsive intelligence and systems-level real estate innovations."
+        />
+      </Section>
+    </Track>
   )
 }
 
