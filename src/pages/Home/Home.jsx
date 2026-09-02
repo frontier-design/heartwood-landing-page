@@ -1,12 +1,12 @@
 import Navigation from '../../components/Navigation/Navigation.jsx'
 import Landing from './Components/Landing.jsx'
-import Intro from './Components/Intro.jsx'
 import Approach from './Components/Approach.jsx'
-import Development from './Components/Development.jsx'
-import Pillars from './Components/Pillars.jsx'
+import Intelligence from './Components/Intelligence.jsx'
+import Innovation from './Components/Innovation.jsx'
 import Resilience from './Components/Resilience.jsx'
 import Projects from './Components/Projects.jsx'
-import Performance from './Components/Performance.jsx'
+import Invest from './Components/Invest.jsx'
+import Team from './Components/Team.jsx'
 import FutureBuilt from './Components/FutureBuilt.jsx'
 import Footer from './Components/Footer.jsx'
 
@@ -15,14 +15,14 @@ function Home() {
     <>
       <Navigation />
       <Landing />
-      <Intro />
       <Approach />
-      <Development />
-      <Pillars />
+      <Intelligence />
+      <Innovation />
       <Resilience />
       <Projects />
-      <Performance />
+      <Invest />
       <FutureBuilt />
+      <Team />
       <Footer />
     </>
   )

@@ -92,11 +92,16 @@ export function ringsLayout(count, w, h, opts = {}) {
   const clump = opts.clump ?? 0.4
   const strayOpt = opts.stray ?? 0.12
 
+  // Viewport-driven thinning: `count` is already scaled by the engine, but an
+  // explicit ringDotCounts array bypasses it, so apply the same multiplier here.
+  const densityScale = opts.densityScale ?? 1
   let ringDotCounts = opts.ringDotCounts
   if (!Array.isArray(ringDotCounts) || ringDotCounts.length === 0) {
     const ringCount = radii.length
     const per = Math.round(count / ringCount)
     ringDotCounts = Array.from({ length: ringCount }, () => per)
+  } else {
+    ringDotCounts = ringDotCounts.map((c) => Math.max(1, Math.round(c * densityScale)))
   }
   const ringCount = ringDotCounts.length
 

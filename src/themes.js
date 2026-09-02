@@ -22,9 +22,9 @@ export const fontFaces = css`
 
 export const monoCallout = css`
   font-family: "PP Right Serif Mono", monospace;
-  font-weight: 300;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  /* letter-spacing: 0.02em; */
   font-size: clamp(0.875rem, 1.15vw, 1.5rem);
 `;
 
@@ -32,13 +32,13 @@ export const displayHeading = css`
   font-family: "PP Frama", sans-serif;
   font-weight: 500;
   line-height: 1.25;
-  font-size: clamp(1.35rem, 2.5vw, 3.25rem);
+  font-size: clamp(1.65rem, 2.5vw, 3.25rem);
   text-wrap: pretty;
 `;
 
 export const bodySerif = css`
   font-family: "PP Right Serif Mono", monospace;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.6;
   font-size: clamp(0.95rem, 1.05vw, 1.25rem);
 `;
@@ -56,4 +56,6 @@ export const colors = {
   lightBlue: "#C5DCEA",
   white: "#ededed",
   gray: "#f4f4f4",
+  rust: "#B5542F",
+  gold: "#B08A4F",
 };

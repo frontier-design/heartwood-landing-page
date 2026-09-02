@@ -5,7 +5,9 @@ import { DotField } from '../../../components/dotfield'
 import { monoCallout, colors } from '../../../themes.js'
 import Wordmark from '../../../assets/images/Heartwood-Wordmark.svg'
 
-const MARK_ANCHOR = { x: 0.28, y: -0.24, color: colors.teal }
+// The FUTURE BUILT mark rides this anchor dot, now placed on the lower-right of
+// the field (was top-left in the archived footer).
+const MARK_ANCHOR = { x: 0.78, y: 0.6, color: colors.teal }
 
 const RING_OPTIONS = {
   ringDotCounts: [90, 150, 210, 300],
@@ -16,7 +18,10 @@ const RING_OPTIONS = {
 }
 const RING_COUNT = RING_OPTIONS.ringDotCounts.reduce((a, b) => a + b, 0) + RING_OPTIONS.anchors.length
 
-const FOOTER_LINKS = ['Terms', 'Land Acknowledgement', 'Socials']
+const FOOTER_LINKS = [
+  { label: 'Terms', href: '#' },
+  { label: 'LinkedIn', href: '#' },
+]
 
 const Section = styled.section`
   position: relative;
@@ -61,7 +66,7 @@ const Line = styled.p`
 
 const LinksCell = styled(GridCell)`
   display: flex;
-  justify-content: flex-end;
+  align-items: baseline;
   flex-wrap: wrap;
   gap: clamp(1.5rem, 3vw, 3rem);
 
@@ -78,6 +83,55 @@ const FooterLink = styled.a`
   color: ${colors.white};
   text-decoration: none;
   white-space: nowrap;
+`
+
+// Email capture: a dark, thin-bordered input butted against a solid white
+// "LEARN MORE" button. Presentational only (no backend) — matches the form on
+// the Invest section.
+const SignupCell = styled(GridCell)`
+  @media ${GRID.MEDIA_MOBILE} {
+    margin-top: clamp(1.25rem, 3vh, 2rem);
+  }
+`
+
+const Signup = styled.form`
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+`
+
+// Same inner padding as the Invest form's `control`, but sized for the dark
+// footer: black field with a faint light border and a teal CTA.
+const EmailInput = styled.input`
+  ${monoCallout}
+  flex: 1 1 auto;
+  min-width: 0;
+  color: ${colors.white};
+  background: ${colors.black};
+  border: 1px solid rgba(237, 237, 237, 0.25);
+  border-right: none;
+  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.7rem, 1.1vw, 0.95rem);
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  outline: none;
+
+  &::placeholder {
+    color: rgba(237, 237, 237, 0.5);
+  }
+
+  &:focus {
+    border-color: ${colors.white};
+  }
+`
+
+const SubmitButton = styled.button`
+  ${monoCallout}
+  flex: 0 0 auto;
+  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1.5rem, 2.5vw, 2.25rem);
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  color: ${colors.black};
+  background: ${colors.teal};
+  border: none;
+  cursor: pointer;
 `
 
 const Graph = styled.div`
@@ -122,6 +176,8 @@ function Footer() {
   const fieldRef = useRef(null)
   const markRef = useRef(null)
 
+  // Park the FUTURE BUILT mark onto its live anchor dot every frame so it drifts
+  // and repels with the field.
   useEffect(() => {
     let raf
     let markIndex = null
@@ -176,7 +232,7 @@ function Footer() {
       </Overlay>
 
       <TopBar>
-        <Contact $start={1} $span={6} $spanTablet={4}>
+        <Contact $start={1} $span={3} $spanTablet={4} $spanMobile={4}>
           <Line>info@heartwood.com</Line>
           <Line>
             25 King St W, Toronto,
@@ -184,13 +240,19 @@ function Footer() {
             Ontario M5L 2A1
           </Line>
         </Contact>
-        <LinksCell $start={7} $span={6} $startTablet={5} $spanTablet={4}>
-          {FOOTER_LINKS.map((label) => (
-            <FooterLink key={label} href="#">
-              {label}
+        <LinksCell $start={4} $span={3} $startTablet={5} $spanTablet={4} $spanMobile={4}>
+          {FOOTER_LINKS.map((link) => (
+            <FooterLink key={link.label} href={link.href}>
+              {link.label}
             </FooterLink>
           ))}
         </LinksCell>
+        <SignupCell $start={9} $span={4} $startTablet={5} $spanTablet={4} $spanMobile={4}>
+          <Signup onSubmit={(e) => e.preventDefault()}>
+            <EmailInput type="email" placeholder="Enter your email" aria-label="Email address" />
+            <SubmitButton type="submit">Learn More</SubmitButton>
+          </Signup>
+        </SignupCell>
       </TopBar>
 
       <Graph />

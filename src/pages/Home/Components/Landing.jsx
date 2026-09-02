@@ -18,7 +18,11 @@ const Section = styled.section`
 const Frame = styled.div`
   position: relative;
   width: 100vw;
-  height: 100vh;
+  /* +1px overscan: this Frame is GSAP-pinned as position:fixed at one viewport
+     tall; the extra pixel prevents a ≤1px subpixel gap at the bottom edge, and
+     overflow:clip hides it below the fold. See the note in Resilience.jsx. */
+  height: calc(100vh + 1px);
+  overflow: clip;
   background-image: url(${landingImage});
   background-size: cover;
   background-position: center;
@@ -30,11 +34,23 @@ const Hero = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  overflow: hidden;
 `
 
 const Field = styled.div`
   position: absolute;
   inset: 0;
+
+  /* On narrow screens keep the graph from collapsing: pin a min width and let
+     it overflow past the viewport (clipped by Hero) so the ring's min(w,h)
+     axis never shrinks below this. */
+  @media ${GRID.MEDIA_MOBILE} {
+    left: 50%;
+    right: auto;
+    width: 100%;
+    min-width: 640px;
+    transform: translateX(-50%);
+  }
 `
 
 const Overlay = styled.div`
@@ -49,8 +65,11 @@ const Tagline = styled.p`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: clamp(16rem, 30vw, 26rem);
   color: ${colors.white};
-  white-space: nowrap;
+  text-align: center;
+  text-wrap: pretty;
+  line-height: 1.5;
 `
 
 const Corner = styled.p`
@@ -70,9 +89,19 @@ const Corner = styled.p`
   }
 `
 
+const RING_OPTS = {
+  ringDotCounts: [90, 110, 130, 150],
+  minRadius: 0.28,
+  maxRadius: 0.48,
+  radiusScale: 0.92,
+  clump: 0.2,
+  stray: 0,
+  jitter: 12,
+}
+
 const STATES = [
   { layout: 'scatter', opts: { margin: 0.06, count: 28 } },
-  { layout: 'rings', opts: { rings: 1, clump: 0.5, stray: 0.06, count: 140 } },
+  { layout: 'rings', opts: RING_OPTS },
 ]
 
 function Landing() {
@@ -93,20 +122,22 @@ function Landing() {
       },
     })
 
-    // GSAP freezes the pinned Frame's pixel size and only recalculates it on a
-    // debounced refresh, which stalls the DotField's ResizeObserver. The
-    // DotField's own ResizeObserver rescales the canvas live during the drag;
-    // we only defer the expensive cross-trigger refresh to when resizing stops
-    // so a drag isn't a storm of full-layout recalcs.
-    let refreshTimer
+    // The pin freezes the Frame's pixel size, so the DotField's ResizeObserver
+    // can't see the viewport change until ScrollTrigger recomputes the pin. We
+    // refresh live, throttled to one call per animation frame, so the canvas
+    // tracks the window while dragging instead of snapping only after you stop.
+    let raf = 0
     const onResize = () => {
-      clearTimeout(refreshTimer)
-      refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 150)
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        ScrollTrigger.refresh()
+      })
     }
     window.addEventListener('resize', onResize)
 
     return () => {
-      clearTimeout(refreshTimer)
+      if (raf) cancelAnimationFrame(raf)
       window.removeEventListener('resize', onResize)
       st.kill()
     }
@@ -126,7 +157,11 @@ function Landing() {
             />
           </Field>
           <Overlay>
-            <Tagline>BUILDING THE FUTURE OF REAL ESTATE</Tagline>
+            <Tagline>
+              HEARTWOOD IS A NEXT-GENERATION REAL ESTATE PLATFORM FOCUSED ON
+              ENDURING BUILDINGS, HEALTHIER HOMES, STRONGER COMMUNITIES, AND
+              DURABLE INVESTMENT RETURNS.
+            </Tagline>
             <Corner>
               FUTURE
               <br />

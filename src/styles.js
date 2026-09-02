@@ -11,12 +11,15 @@ const GlobalStyle = createGlobalStyle`
     font-weight: normal;
   }
 
-  html,
-  body {
+  html {
     overflow-x: hidden;
   }
 
   body {
+    /* clip, not hidden: html's overflow already propagates to the viewport, so a
+       hidden here would make body its own (never-scrolling) scroll container and
+       break position:sticky for every descendant. */
+    overflow-x: clip;
     font-family: system-ui, -apple-system, sans-serif;
   }
 `;

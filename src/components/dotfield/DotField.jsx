@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import styled from 'styled-components'
 import { DotFieldEngine } from './dotFieldEngine.js'
+import { densityScaleForViewport } from './viewport.js'
 
 // ─── DotField ────────────────────────────────────────────────────────────────
 // Reusable p5.js dot field. Mount it anywhere and switch `layout` per stage to
@@ -48,6 +49,8 @@ function DotField(
     wander = true,
     cursor = true,
     drift = 2,
+    seed,
+    responsive = true,
   },
   ref,
 ) {
@@ -73,6 +76,8 @@ function DotField(
       layout,
       layoutOptions,
       states: states?.map((s) => ({ name: s.layout, opts: s.opts ?? {} })),
+      seed,
+      densityScale: responsive ? densityScaleForViewport(host.offsetWidth, host.offsetHeight) : 1,
     })
     engineRef.current = engine
 
@@ -131,6 +136,9 @@ function DotField(
       ro = new ResizeObserver((entries) => {
         const rect = entries[0].contentRect
         if (rect.width > 0 && rect.height > 0) {
+          // Set the density first (bucketed, so it only changes on real steps)
+          // so engine.resize() rebuilds the field at the new count in one pass.
+          if (responsive) engine.densityScale = densityScaleForViewport(rect.width, rect.height)
           instance.resizeCanvas(rect.width, rect.height)
           engine.resize(instance, rect.width, rect.height)
         }

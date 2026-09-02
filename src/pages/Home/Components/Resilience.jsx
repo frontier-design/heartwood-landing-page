@@ -32,19 +32,32 @@ const SLIDES = [
   },
 ]
 
-const Section = styled.section`
+/* Scroll track: one viewport per slide. The visible Section sticks inside it, so
+   the "pin" is handled by the compositor rather than by GSAP toggling
+   position:fixed from JS. A JS pin lags the browser's scroll paint by a frame,
+   which showed the white body behind the pin-spacer whenever a snap parked the
+   scroll exactly on the pin boundary and the next wheel tick crossed it. The
+   track shares the Section's background so any subpixel seam stays dark. */
+const Track = styled.div`
   position: relative;
+  height: calc(100vh * ${SLIDES.length});
+  height: calc(100lvh * ${SLIDES.length});
+  background-color: ${colors.black};
+`
+
+const Section = styled.section`
+  position: sticky;
+  top: 0;
   width: 100vw;
   height: 100vh;
-  height: 100svh;
+  height: 100lvh;
   background-color: ${colors.black};
   overflow: clip;
-  overflow-clip-margin: 1px;
 `
 
 const Background = styled.div`
   position: absolute;
-  inset: -1px 0 0 0;
+  inset: 0;
   z-index: 0;
   background: ${(p) => p.$image};
   background-size: cover;
@@ -146,26 +159,28 @@ const Dot = styled.button`
 `
 
 function Resilience() {
-  const sectionRef = useRef(null)
+  const trackRef = useRef(null)
   const stRef = useRef(null)
   const [active, setActive] = useState(0)
 
   useEffect(() => {
     const last = SLIDES.length - 1
     const st = ScrollTrigger.create({
-      trigger: sectionRef.current,
+      trigger: trackRef.current,
       start: 'top top',
-      end: () => '+=' + window.innerHeight * last,
-      pin: true,
-      scrub: 0.5,
+      // Track bottom meets viewport bottom exactly when the sticky Section stops
+      // sticking, so progress 0→1 maps onto the full stuck range.
+      end: 'bottom bottom',
+      scrub: 0.4,
+      // Snap to the nearest slide (not directional) with a single settle duration
+      // and no delay, so the snap tween doesn't overlap the scrub easing — that
+      // overlap was causing a small overshoot/jump at the moment of snapping.
       snap: {
         snapTo: 1 / last,
-        duration: { min: 0.2, max: 0.5 },
-        delay: 0.05,
-        ease: 'power1.inOut',
+        duration: 0.4,
+        ease: 'power2.inOut',
+        directional: false,
       },
-      invalidateOnRefresh: true,
-      refreshPriority: 1,
       onUpdate: (self) => {
         const idx = Math.round(self.progress * last)
         setActive((prev) => (prev === idx ? prev : idx))
@@ -184,35 +199,37 @@ function Resilience() {
   }
 
   return (
-    <Section ref={sectionRef}>
-      {SLIDES.map((s, i) => (
-        <Background key={s.heading} $image={s.image} $active={i === active} />
-      ))}
-      <Overlay />
-      <Content>
-        <Column $start={1} $span={6} $spanTablet={5}>
-          <Eyebrow>{EYEBROW}</Eyebrow>
-          <TextStack>
-            {SLIDES.map((s, i) => (
-              <TextBlock key={s.heading} $active={i === active}>
-                <Heading $active={i === active}>{s.heading}</Heading>
-                <Body $active={i === active}>{s.body}</Body>
-              </TextBlock>
-            ))}
-          </TextStack>
-        </Column>
-      </Content>
-      <Dots>
+    <Track ref={trackRef}>
+      <Section>
         {SLIDES.map((s, i) => (
-          <Dot
-            key={s.heading}
-            $active={i === active}
-            onClick={() => goTo(i)}
-            aria-label={s.heading}
-          />
+          <Background key={s.heading} $image={s.image} $active={i === active} />
         ))}
-      </Dots>
-    </Section>
+        <Overlay />
+        <Content>
+          <Column $start={1} $span={6} $spanTablet={5}>
+            <Eyebrow>{EYEBROW}</Eyebrow>
+            <TextStack>
+              {SLIDES.map((s, i) => (
+                <TextBlock key={s.heading} $active={i === active}>
+                  <Heading $active={i === active}>{s.heading}</Heading>
+                  <Body $active={i === active}>{s.body}</Body>
+                </TextBlock>
+              ))}
+            </TextStack>
+          </Column>
+        </Content>
+        <Dots>
+          {SLIDES.map((s, i) => (
+            <Dot
+              key={s.heading}
+              $active={i === active}
+              onClick={() => goTo(i)}
+              aria-label={s.heading}
+            />
+          ))}
+        </Dots>
+      </Section>
+    </Track>
   )
 }
 

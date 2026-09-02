@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { GRID } from '../../../grid'
-import { monoCallout, colors } from '../../../themes.js'
+import { Grid, GridCell, GRID } from '../../../grid'
+import { monoCallout, displayHeading, colors } from '../../../themes.js'
 import hamiltonMain from '../../../assets/images/places/Hamilton, ON 1570 Main Street West.webp'
 import hamiltonParkside from '../../../assets/images/places/Hamilton, ON 308 Parkside Drive.webp'
 import mississaugaTomken from '../../../assets/images/places/Mississauga, ON 4094 Tomken Road.webp'
@@ -11,27 +11,40 @@ import torontoLawrence2102 from '../../../assets/images/places/Toronto, ON 2102 
 import torontoLawrence3385 from '../../../assets/images/places/Toronto, ON 3385 Lawrence Avenue East.webp'
 import torontoSherbourne from '../../../assets/images/places/Toronto, ON 353 Sherbourne St.webp'
 
+// 2102 Lawrence leads so it is the default-expanded item on the left.
 const PROJECTS = [
-  { location: 'ORILLIA, ON', name: '175 Oxford Street', image: `url(${orilliaOxford})` },
-  { location: 'TORONTO, ON', name: '2102 Lawrence Avenue East', image: `url(${torontoLawrence2102})` },
-  { location: 'HAMILTON, ON', name: '1570 Main Street West', image: `url(${hamiltonMain})` },
-  { location: 'MISSISSAUGA, ON', name: '4094 Tomken Road', image: `url(${mississaugaTomken})` },
-  { location: 'TORONTO, ON', name: '353 Sherbourne Street', image: `url(${torontoSherbourne})` },
-  { location: 'OTTAWA, ON', name: '360 Kennedy Lane', image: `url(${ottawaKennedy})` },
-  { location: 'HAMILTON, ON', name: '308 Parkside Drive', image: `url(${hamiltonParkside})` },
-  { location: 'TORONTO, ON', name: '3385 Lawrence Avenue East', image: `url(${torontoLawrence3385})` },
+  { location: 'TORONTO, ONTARIO', name: '2102 Lawrence Avenue East', status: 'PENDING', image: `url(${torontoLawrence2102})` },
+  { location: 'ORILLIA, ONTARIO', name: '175 Oxford Street', status: 'PENDING', image: `url(${orilliaOxford})` },
+  { location: 'HAMILTON, ONTARIO', name: '1570 Main Street West', status: 'PENDING', image: `url(${hamiltonMain})` },
+  { location: 'MISSISSAUGA, ONTARIO', name: '4094 Tomken Road', status: 'PENDING', image: `url(${mississaugaTomken})` },
+  { location: 'TORONTO, ONTARIO', name: '353 Sherbourne Street', status: 'PENDING', image: `url(${torontoSherbourne})` },
+  { location: 'OTTAWA, ONTARIO', name: '360 Kennedy Lane', status: 'PENDING', image: `url(${ottawaKennedy})` },
+  { location: 'HAMILTON, ONTARIO', name: '308 Parkside Drive', status: 'PENDING', image: `url(${hamiltonParkside})` },
+  { location: 'TORONTO, ONTARIO', name: '3385 Lawrence Avenue East', status: 'PENDING', image: `url(${torontoLawrence3385})` },
 ]
+
+const INITIAL = 0
 
 const Section = styled.section`
   position: relative;
   width: 100vw;
-  overflow: hidden;
+  background-color: ${colors.gray};
+  padding: clamp(3rem, 8vh, 6rem) 0;
+
+  @media ${GRID.MEDIA_MOBILE} {
+    padding-bottom: 0;
+  }
 `
 
-const Row = styled.div`
+const Layout = styled(Grid)`
+  position: relative;
+`
+
+// Contained in the grid (cols 1 → 12), no longer a viewport full-bleed.
+const Row = styled(GridCell)`
   display: flex;
-  width: 100%;
-  height: 100vh;
+  height: clamp(34rem, 88vh, 64rem);
+  overflow: hidden;
 
   @media ${GRID.MEDIA_MOBILE} {
     flex-direction: column;
@@ -41,16 +54,26 @@ const Row = styled.div`
 
 const Item = styled.div`
   position: relative;
-  flex-grow: ${(p) => (p.$active ? 7 : 1)};
+  flex-grow: ${(p) => (p.$active ? 5 : 1)};
   flex-shrink: 1;
   flex-basis: 0;
   min-width: 0;
   overflow: hidden;
   cursor: pointer;
-  background: ${(p) => p.$image};
-  background-size: cover;
-  background-position: center;
   transition: flex-grow 1s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* The image lives on a layer inset 5px above the top; the parent's
+     overflow:hidden clips that top strip (crop 5px off the top) while
+     background:cover keeps the rest filled — no gap at the bottom. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -5px 0 0 0;
+    z-index: 0;
+    background: ${(p) => p.$image};
+    background-size: cover;
+    background-position: center;
+  }
 
   @media ${GRID.MEDIA_MOBILE} {
     flex-basis: auto;
@@ -62,16 +85,15 @@ const Item = styled.div`
   }
 `
 
+// Dark card pinned to the top-left of the active item.
 const Info = styled.div`
   position: absolute;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
   z-index: 2;
-  height: clamp(11rem, 16vw, 16rem);
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   padding: clamp(1.5rem, 3vw, 3rem);
   background-color: ${colors.black};
   opacity: ${(p) => (p.$active ? 1 : 0)};
@@ -79,7 +101,6 @@ const Info = styled.div`
   pointer-events: none;
 
   @media ${GRID.MEDIA_MOBILE} {
-    height: auto;
     opacity: 1;
     transition: none;
   }
@@ -87,7 +108,7 @@ const Info = styled.div`
 
 const Location = styled.p`
   ${monoCallout}
-  margin: 0 0 clamp(1rem, 2.5vh, 2rem);
+  margin: 0;
   color: ${colors.white};
   opacity: ${(p) => (p.$active ? 1 : 0)};
   transform: translateY(${(p) => (p.$active ? '0' : '1rem')});
@@ -102,25 +123,36 @@ const Location = styled.p`
   }
 `
 
+const Status = styled.p`
+  ${monoCallout}
+  margin: clamp(0.35rem, 0.8vh, 0.6rem) 0 0;
+  color: ${colors.rust};
+  opacity: ${(p) => (p.$active ? 1 : 0)};
+  transform: translateY(${(p) => (p.$active ? '0' : '1rem')});
+  transition:
+    opacity ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.55s' : '0s')},
+    transform ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.55s' : '0s')};
+
+  @media ${GRID.MEDIA_MOBILE} {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+`
+
 const Name = styled.h3`
-  font-family: 'PP Frama', sans-serif;
-  font-weight: 500;
-  line-height: 1.05;
+  ${displayHeading}
+  margin: clamp(2.5rem, 7vh, 4.5rem) 0 0;
   text-transform: uppercase;
-  font-size: clamp(1.75rem, 3.2vw, 3.25rem);
-  margin: 0;
-  text-wrap: pretty;
-  max-width: 65%;
   color: ${colors.white};
   opacity: ${(p) => (p.$active ? 1 : 0)};
   transform: translateY(${(p) => (p.$active ? '0' : '1rem')});
   transition:
-    opacity ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.6s' : '0s')},
-    transform ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.6s' : '0s')};
+    opacity ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.65s' : '0s')},
+    transform ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.65s' : '0s')};
 
   @media ${GRID.MEDIA_MOBILE} {
-    max-width: none;
-    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    margin-top: clamp(1.5rem, 4vh, 2.5rem);
     opacity: 1;
     transform: none;
     transition: none;
@@ -128,26 +160,47 @@ const Name = styled.h3`
 `
 
 function Projects() {
-  const [active, setActive] = useState(0)
+  const [active, setActive] = useState(INITIAL)
+  const [paused, setPaused] = useState(false)
+
+  // While no one is hovering, sweep the expanded item through the row one at a
+  // time so the width extension animates sequentially. Hovering pauses it.
+  useEffect(() => {
+    if (paused) return
+    const id = setInterval(() => {
+      setActive((a) => (a + 1) % PROJECTS.length)
+    }, 3600)
+    return () => clearInterval(id)
+  }, [paused])
 
   return (
-    <Section>
-      <Row onMouseLeave={() => setActive(0)}>
-        {PROJECTS.map((p, i) => (
-          <Item
-            key={p.name}
-            $active={i === active}
-            $image={p.image}
-            onMouseEnter={() => setActive(i)}
-            onClick={() => setActive(i)}
-          >
-            <Info $active={i === active}>
-              <Location $active={i === active}>{p.location}</Location>
-              <Name $active={i === active}>{p.name}</Name>
-            </Info>
-          </Item>
-        ))}
-      </Row>
+    <Section id="properties">
+      <Layout>
+        <Row
+          $start={1}
+          $span={12}
+          $spanTablet={8}
+          $spanMobile={4}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          {PROJECTS.map((p, i) => (
+            <Item
+              key={p.name}
+              $active={i === active}
+              $image={p.image}
+              onMouseEnter={() => setActive(i)}
+              onClick={() => setActive(i)}
+            >
+              <Info $active={i === active}>
+                <Location $active={i === active}>{p.location}</Location>
+                <Status $active={i === active}>{p.status}</Status>
+                <Name $active={i === active}>{p.name}</Name>
+              </Info>
+            </Item>
+          ))}
+        </Row>
+      </Layout>
     </Section>
   )
 }

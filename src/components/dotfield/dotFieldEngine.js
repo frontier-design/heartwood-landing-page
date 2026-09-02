@@ -60,11 +60,17 @@ function mulberry32(seed) {
 export class DotFieldEngine {
   constructor(config = {}) {
     this.count = config.count ?? 100
-    this.dotDiameter = config.dotDiameter ?? 8
-    this.dotR = this.dotDiameter / 2
+    // Base (author-set) dot size. The effective diameter gets a gentle
+    // viewport-driven multiplier (see _applyDiameterScale) so smaller screens
+    // read a touch smaller without a remount.
+    this.baseDotDiameter = config.dotDiameter ?? 8
     this.wanderEnabled = config.wander ?? true
     this.cursorEnabled = config.cursor ?? true
     this.driftAmp = config.drift ?? 2
+    // Multiplier on every state's dot count so the field can thin out on small
+    // viewports without a remount. 1 = the configured counts (the ceiling).
+    this.densityScale = config.densityScale ?? 1
+    this._applyDiameterScale()
     // Fixed per-instance seed so layouts stay put across resizes.
     this.seed = (config.seed ?? Math.floor(Math.random() * 0xffffffff)) >>> 0 || 1
     this.dots = []
@@ -139,10 +145,25 @@ export class DotFieldEngine {
     }
   }
 
+  // Gentle viewport-driven dot-size multiplier. densityScale runs ~0.35..1, so
+  // this maps to ~0.9..1 — small screens shrink the dots only slightly (never
+  // vanishing), and at full density (1) the base size is preserved exactly.
+  _diameterScale() {
+    return 0.85 + 0.15 * this.densityScale
+  }
+
+  _applyDiameterScale() {
+    this.dotDiameter = this.baseDotDiameter * this._diameterScale()
+    this.dotR = this.dotDiameter / 2
+  }
+
   resize(p, w, h) {
     this._p = p
     this.w = w
     this.h = h
+    // DotField sets engine.densityScale directly before calling resize(), so
+    // re-derive the effective dot size here to track the new viewport bucket.
+    this._applyDiameterScale()
     for (const d of this.dots) {
       d.x = p.constrain(d.x, this.dotR, Math.max(this.dotR, w - this.dotR))
       d.y = p.constrain(d.y, this.dotR, Math.max(this.dotR, h - this.dotR))
@@ -152,6 +173,21 @@ export class DotFieldEngine {
     // field is scroll-driven, otherwise snap the active layout (no animation).
     if (this._scrubActive) this.seek(this._scrubProgress)
     else if (this._current) this.setLayout(p, this._current.name, this._current.opts, { instant: true })
+  }
+
+  // Adjust the viewport-driven density multiplier and rebuild live: re-scrub at
+  // the current progress when scroll-driven, otherwise snap the active layout.
+  // No remount, so the field just gains/sheds dots in place.
+  setDensityScale(scale) {
+    const s = Math.max(0.05, scale || 1)
+    if (Math.abs(s - this.densityScale) < 1e-3) return
+    this.densityScale = s
+    this._applyDiameterScale()
+    this._posCache = []
+    if (this._scrubActive) this.seek(this._scrubProgress)
+    else if (this._current && this._p) {
+      this.setLayout(this._p, this._current.name, this._current.opts, { instant: true })
+    }
   }
 
   // Declare the ordered states the scrub timeline interpolates between. Does not
@@ -169,9 +205,13 @@ export class DotFieldEngine {
     if (!state) return []
     const build = layouts[state.name]
     if (!build) return []
-    const total = Math.max(0, Math.round(state.opts.count ?? this.count))
+    const total = Math.max(0, Math.round((state.opts.count ?? this.count) * this.densityScale))
     const rand = mulberry32(this._seedForState(index))
-    const positions = build(total, this.w, this.h, { ...state.opts, rand })
+    const positions = build(total, this.w, this.h, {
+      ...state.opts,
+      rand,
+      densityScale: this.densityScale,
+    })
     this._posCache[index] = positions
     return positions
   }
@@ -301,9 +341,13 @@ export class DotFieldEngine {
     const build = layouts[name]
     if (!build) return
     // opts.count lets a stage use fewer/more dots than the base count.
-    const total = Math.max(0, Math.round(opts.count ?? this.count))
+    const total = Math.max(0, Math.round((opts.count ?? this.count) * this.densityScale))
     const rand = mulberry32(this.seed)
-    const positions = build(total, this.w, this.h, { ...opts, rand })
+    const positions = build(total, this.w, this.h, {
+      ...opts,
+      rand,
+      densityScale: this.densityScale,
+    })
     this._transitionTo(p, positions, { ...opts, ...control })
   }
 
