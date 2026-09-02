@@ -23,6 +23,7 @@ const Frame = styled.div`
   top: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: clip;
   background-image: url(${landingImage});
   background-size: cover;
