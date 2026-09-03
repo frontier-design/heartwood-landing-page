@@ -2,14 +2,41 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import styled from 'styled-components'
 import { DotFieldEngine } from './dotFieldEngine.js'
 import { densityScaleForViewport } from './viewport.js'
+import ppRightSerifMono from '../../assets/fonts/PPRightSerifMono-Variable.woff2'
+
+// The chart overlays draw text on a 2D canvas via native fillText, which only
+// resolves a web font once it's fully loaded AND matched by its real family
+// name. This is a variable woff2 whose internal name ("PP Right Serif Mono
+// Variable") differs from the CSS @font-face alias, so referencing it by the
+// alias silently falls back to a system font. p5's own loadFont() parses the
+// file, registers the FontFace under its real name and waits for it to be
+// ready, then hands back a p5.Font object we can pass straight to textFont().
+// Shared across every DotField instance (one fetch/parse for the whole page).
+let overlayFontPromise = null
+function loadOverlayFont(p5Instance) {
+  if (!overlayFontPromise) overlayFontPromise = p5Instance.loadFont(ppRightSerifMono).catch(() => null)
+  return overlayFontPromise
+}
 
 // ─── DotField ────────────────────────────────────────────────────────────────
 // Reusable p5.js dot field. Mount it anywhere and switch `layout` per stage to
-// transition the dots between arrangements (ring, rings, cluster, scatter, grid).
+// transition the dots between arrangements, or pass ordered `states` and scrub
+// between them with the imperative seek(progress).
+//
+// Layouts (see layouts/index.js):
+//   scatter, rings                                  — field arrangements
+//   icon                                            — pixel-grid glyphs
+//   barChart, simpleBars, heatmap, dotPlot,
+//   scatterPlot, beeswarm, timeline                 — data visualisations
+//
+// Chart layouts also draw their axes/ticks/legends as a canvas overlay that
+// cross-fades between states (see overlays.js). Every layout morphs into any
+// other, so a scatter can gather into rings, become an icon, then a chart.
 //
 // Props:
-//   layout        — 'scatter' | 'ring' | 'rings' | 'cluster' | 'grid'
-//   layoutOptions — layout-specific options (see layouts.js)
+//   layout        — layout name (trigger path)
+//   layoutOptions — layout-specific options
+//   states        — [{ layout, opts }] keyframes for the scrub path (seek())
 //   count         — number of dots (structural; set at mount)
 //   dotColor      — hex fill colour
 //   dotDiameter   — base dot diameter in px (structural; set at mount)
@@ -17,6 +44,9 @@ import { densityScaleForViewport } from './viewport.js'
 //   wander        — dots drift while idle (structural; set at mount)
 //   cursor        — dots are nudged away from the cursor (structural; set at mount)
 //   drift         — px amplitude of the idle "breathing" on parked dots (structural)
+//   overlays      — draw chart overlays (default true)
+//   seed          — fixed PRNG seed so two fields produce identical arrangements
+//   responsive    — thin the dot count on small viewports (default true)
 
 const Host = styled.div`
   width: 100%;
@@ -52,6 +82,7 @@ function DotField(
     drift = 2,
     seed,
     responsive = true,
+    overlays = true,
   },
   ref,
 ) {
@@ -61,8 +92,10 @@ function DotField(
   // Refs let draw() read the latest colours without re-mounting the sketch.
   const dotColorRef = useRef(dotColor)
   const backgroundRef = useRef(background)
+  const overlaysRef = useRef(overlays)
   dotColorRef.current = dotColor
   backgroundRef.current = background
+  overlaysRef.current = overlays
 
   // Mount the p5 sketch once. Structural props (count, dotDiameter, wander,
   // cursor) are read here and are not meant to change without a remount.
@@ -117,6 +150,8 @@ function DotField(
 
         engine.update(p)
 
+        // Overlays may leave a stroke set; dots are always stroke-free.
+        p.noStroke()
         const base = parseRgb(dotColorRef.current)
         for (const d of engine.dots) {
           if (d.alpha <= 0 || d.diam <= 0) continue
@@ -124,6 +159,9 @@ function DotField(
           p.fill(c.r, c.g, c.b, d.alpha)
           p.circle(d.x + d.nudgeX + d.driftX, d.y + d.nudgeY + d.driftY, d.diam)
         }
+
+        // Chart axes/labels sit on top of the dots and cross-fade between states.
+        if (overlaysRef.current) engine.drawOverlays(p, base)
       }
     }
 
@@ -133,6 +171,13 @@ function DotField(
       if (cancelled || !host) return
       instance = new p5(sketch, host)
       p5Ref.current = instance
+
+      // Load the overlay font via p5 (parses the woff2, registers its real
+      // family name, awaits document.fonts.ready) and hand the p5.Font to the
+      // engine. The draw loop picks it up on the next frame once it resolves.
+      loadOverlayFont(instance).then((font) => {
+        if (font && !cancelled) engine.overlayFont = font
+      })
 
       ro = new ResizeObserver((entries) => {
         const rect = entries[0].contentRect
@@ -196,6 +241,9 @@ function DotField(
       if (engine && p) engine.setLayout(p, name, opts ?? {})
     },
     getEngine: () => engineRef.current,
+    // Resolved overlay geometry of the active chart layout (trigger path), for
+    // aligning DOM annotations to the chart the field actually drew.
+    getLayoutMeta: () => engineRef.current?.getLayoutMeta() ?? null,
   }))
 
   return <Host ref={hostRef} />

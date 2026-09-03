@@ -3,8 +3,8 @@ import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, colors } from '../../../themes.js'
 
 const FIELDS = [
-  { name: 'name', label: 'NAME', type: 'text', placeholder: 'Enter your name' },
-  { name: 'email', label: 'EMAIL', type: 'email', placeholder: 'Enter your email' },
+  { name: 'name', label: 'NAME*', type: 'text', placeholder: 'Enter your name' },
+  { name: 'email', label: 'EMAIL*', type: 'email', placeholder: 'Enter your email' },
   { name: 'company', label: 'COMPANY', type: 'text', placeholder: 'Enter your company name' },
   { name: 'phone', label: 'PHONE', type: 'tel', placeholder: 'Enter your phone number' },
 ]

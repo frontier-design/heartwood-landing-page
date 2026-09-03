@@ -31,7 +31,9 @@ export const monoCallout = css`
 export const displayHeading = css`
   font-family: "PP Frama", sans-serif;
   font-weight: 500;
-  font-variation-settings: "wght" 500, "slnt" 0;
+  font-variation-settings:
+    "wght" 500,
+    "slnt" 0;
   font-style: normal;
   font-synthesis: none;
   line-height: 1.25;

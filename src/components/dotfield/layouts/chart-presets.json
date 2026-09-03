@@ -1,0 +1,111 @@
+{
+  "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  "barChart": {
+    "bars": [
+      { "label": "Code\nMinimum", "total": 155, "base": 72 },
+      { "label": "Heartwood\nProject", "total": 93, "base": 55 },
+      { "label": "Heartwood\nw/ Solar", "total": 87, "base": 28 }
+    ],
+    "yMin": 20,
+    "yMax": 180,
+    "rows": 32,
+    "barCols": 5,
+    "dimAlpha": 100,
+    "diam": 10,
+    "gap": 3,
+    "yStep": 20,
+    "yLabel": "kWh/m² year",
+    "legend": ["TEUI", "Utility Cost"],
+    "padding": { "l": 96, "r": 16, "t": 72, "b": 56 }
+  },
+  "simpleBars": {
+    "cols": 10,
+    "rows": 10,
+    "dimAlpha": 51,
+    "diam": 20,
+    "gap": 6,
+    "legend": ["Active", "Inactive"],
+    "padding": { "l": 16, "r": 16, "t": 80, "b": 48 }
+  },
+  "heatmap": {
+    "rows": 7,
+    "cells": 240,
+    "levels": [38, 90, 150, 210, 255],
+    "weights": [0.3, 0.25, 0.2, 0.15, 0.1],
+    "diam": 14,
+    "gap": 3,
+    "rowLabels": ["Mon", "", "Wed", "", "Fri", "", "Sun"],
+    "legend": ["Less", "More"],
+    "stagger": 1200,
+    "padding": { "l": 56, "r": 16, "t": 40, "b": 64 }
+  },
+  "dotPlot": {
+    "categories": [
+      { "label": "Heating", "before": 68, "after": 22 },
+      { "label": "Cooling", "before": 42, "after": 18 },
+      { "label": "Lighting", "before": 35, "after": 12 },
+      { "label": "Hot Water", "before": 28, "after": 15 },
+      { "label": "Ventilation", "before": 22, "after": 8 },
+      { "label": "Plug Loads", "before": 18, "after": 14 },
+      { "label": "Envelope Loss", "before": 45, "after": 10 }
+    ],
+    "xMin": 0,
+    "xMax": 80,
+    "chartW": 320,
+    "rowHeight": 28,
+    "diam": 8,
+    "connectorDiam": 5,
+    "connectorGap": 3,
+    "xStep": 20,
+    "xLabel": "kWh/m² year",
+    "legend": ["Code Minimum", "Heartwood"],
+    "padding": { "l": 120, "r": 24, "t": 72, "b": 64 }
+  },
+  "scatterPlot": {
+    "xMin": 15000,
+    "xMax": 42000,
+    "yMin": 0,
+    "yMax": 1,
+    "minChartW": 240,
+    "maxChartW": 540,
+    "minChartH": 200,
+    "maxChartH": 360,
+    "diam": 9,
+    "xTicks": [15000, 20000, 25000, 30000, 35000, 40000],
+    "yTicks": [0, 0.2, 0.4, 0.6, 0.8, 1],
+    "xLabel": "Income",
+    "yLabel": "Metro Health Index",
+    "padding": { "l": 72, "r": 40, "t": 48, "b": 88 }
+  },
+  "beeswarm": {
+    "groups": [
+      { "label": "G1", "count": 56, "mean": -0.22, "sd": 0.92 },
+      { "label": "G2", "count": 56, "mean": 0.38, "sd": 0.82 },
+      { "label": "G3", "count": 56, "mean": 0.06, "sd": 1.02 }
+    ],
+    "yMin": -3,
+    "yMax": 3,
+    "yStep": 1,
+    "diam": 8,
+    "minChartW": 240,
+    "maxChartW": 520,
+    "minChartH": 200,
+    "maxChartH": 340,
+    "padding": { "l": 72, "r": 40, "t": 48, "b": 88 }
+  },
+  "timeline": {
+    "milestones": [
+      { "t": 0, "label": "Site" },
+      { "t": 0.2, "label": "Design" },
+      { "t": 0.45, "label": "Permitting" },
+      { "t": 0.7, "label": "Construction" },
+      { "t": 1, "label": "Occupancy" }
+    ],
+    "margin": 48,
+    "maxWidth": 560,
+    "smallDiam": 5,
+    "bigDiam": 13,
+    "gap": 3,
+    "dimAlpha": 78
+  }
+}

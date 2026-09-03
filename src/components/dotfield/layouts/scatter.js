@@ -5,6 +5,9 @@
 // anchors — fixed accent points [{ x, y, color, diam }] where x/y are fractions
 //   of the width/height (0..1), so they track the frame on resize. Appended as
 //   coloured dots that participate in the field physics.
+// legend  — optional corner legend { title, total, unit, dotValue, showTotal,
+//   showUnit } drawn by the `scatterLegend` overlay ("TITLE / total" bottom-left,
+//   "1 DOT = value UNIT" bottom-right). Omit for a plain field.
 export function scatterLayout(count, w, h, opts = {}) {
   const random = opts.rand ?? Math.random
   const margin = opts.margin ?? 0.04
@@ -24,6 +27,14 @@ export function scatterLayout(count, w, h, opts = {}) {
         diam: a.diam,
       })
     }
+  }
+
+  if (opts.legend) {
+    const layout = { overlay: 'scatterLegend', ...opts.legend }
+    if (opts.font) layout.font = opts.font
+    if (opts.fontSize) layout.fontSize = opts.fontSize
+    if (opts.textColor) layout.textColor = opts.textColor
+    return { positions, layout }
   }
 
   return positions
