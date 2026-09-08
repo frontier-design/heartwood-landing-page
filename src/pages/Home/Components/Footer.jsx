@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { DotField } from '../../../components/dotfield'
@@ -132,6 +132,18 @@ const SubmitButton = styled.button`
   background: ${colors.teal};
   border: none;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+`
+
+const SignupStatus = styled.p`
+  ${monoCallout}
+  margin: clamp(0.5rem, 1.2vh, 0.85rem) 0 0;
+  font-size: clamp(0.75rem, 0.85vw, 0.95rem);
+  color: ${colors.white};
 `
 
 const Graph = styled.div`
@@ -175,6 +187,26 @@ const WordmarkImg = styled.img`
 function Footer() {
   const fieldRef = useRef(null)
   const markRef = useRef(null)
+  const [status, setStatus] = useState('idle')
+
+  const handleSignup = async (e) => {
+    e.preventDefault()
+    const form = e.currentTarget
+    const payload = Object.fromEntries(new FormData(form))
+    setStatus('sending')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...payload, formType: 'contact' }),
+      })
+      if (!res.ok) throw new Error('Request failed')
+      form.reset()
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
+  }
 
   // Park the FUTURE BUILT mark onto its live anchor dot every frame so it drifts
   // and repels with the field.
@@ -256,10 +288,20 @@ function Footer() {
           })}
         </LinksCell>
         <SignupCell $start={9} $span={4} $startTablet={5} $spanTablet={4} $spanMobile={4}>
-          <Signup onSubmit={(e) => e.preventDefault()}>
-            <EmailInput type="email" placeholder="Enter your email" aria-label="Email address" />
-            <SubmitButton type="submit">Learn More</SubmitButton>
+          <Signup onSubmit={handleSignup}>
+            <EmailInput
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              aria-label="Email address"
+              required
+            />
+            <SubmitButton type="submit" disabled={status === 'sending'}>
+              {status === 'sending' ? 'Sending…' : 'Learn More'}
+            </SubmitButton>
           </Signup>
+          {status === 'success' && <SignupStatus>Thanks — we&rsquo;ll be in touch.</SignupStatus>}
+          {status === 'error' && <SignupStatus>Something went wrong. Please try again.</SignupStatus>}
         </SignupCell>
       </TopBar>
 

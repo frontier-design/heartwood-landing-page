@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import styled, { css } from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, colors } from '../../../themes.js'
@@ -123,9 +124,43 @@ const Submit = styled.button`
   background: ${colors.black};
   border: none;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+`
+
+const StatusMsg = styled.p`
+  ${monoCallout}
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  color: ${(p) => (p.$error ? colors.rust : colors.black)};
 `
 
 function Invest() {
+  const [status, setStatus] = useState('idle')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const form = e.currentTarget
+    const payload = Object.fromEntries(new FormData(form))
+    setStatus('sending')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...payload, formType: 'invest' }),
+      })
+      if (!res.ok) throw new Error('Request failed')
+      form.reset()
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
+  }
+
   return (
     <Section id="investment">
       <Layout>
@@ -140,8 +175,7 @@ function Invest() {
         <Panel $start={7} $span={6} $startTablet={1} $spanTablet={8} $spanMobile={4}>
           <Eyebrow $color={colors.black}>INVEST WITH US</Eyebrow>
           <Heading>Own the future of real estate with us.</Heading>
-          {/* Not wired to a backend — presentational only. */}
-          <Form onSubmit={(e) => e.preventDefault()}>
+          <Form onSubmit={handleSubmit}>
             {FIELDS.map((f) => (
               <Field key={f.name}>
                 <FieldLabel>{f.label}</FieldLabel>
@@ -155,7 +189,15 @@ function Invest() {
                 placeholder="Tell us what you're looking for. We'll reach out with details on our approach"
               />
             </Field>
-            <Submit type="submit">LEARN MORE</Submit>
+            <Submit type="submit" disabled={status === 'sending'}>
+              {status === 'sending' ? 'SENDING…' : 'LEARN MORE'}
+            </Submit>
+            {status === 'success' && (
+              <StatusMsg>Thank you — we&rsquo;ll be in touch shortly.</StatusMsg>
+            )}
+            {status === 'error' && (
+              <StatusMsg $error>Something went wrong. Please try again.</StatusMsg>
+            )}
           </Form>
         </Panel>
       </Layout>

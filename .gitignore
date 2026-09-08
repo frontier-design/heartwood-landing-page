@@ -1,2 +1,11 @@
 .claude
 .cursor
+
+# local env files (secrets — never commit)
+.env
+.env.local
+.env.*.local
+
+# vercel cli
+.vercel
+.env*
