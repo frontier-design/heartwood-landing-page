@@ -62,7 +62,16 @@ const Heading = styled.h2`
 const Body = styled.p`
   ${freightBody}
   margin: clamp(1.5rem, 3vh, 2.25rem) 0 0;
+  padding-right: 15px;
   color: ${colors.black};
+
+  @media ${GRID.MEDIA_TABLET} {
+    padding-right: 0;
+  }
+
+  @media ${GRID.MEDIA_MOBILE} {
+    padding-right: 0;
+  }
 `
 
 const Right = styled(GridCell)`
