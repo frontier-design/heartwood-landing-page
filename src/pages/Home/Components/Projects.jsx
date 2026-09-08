@@ -2,25 +2,24 @@ import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, colors } from '../../../themes.js'
-import hamiltonMain from '../../../assets/images/places/Hamilton, ON 1570 Main Street West.webp'
-import hamiltonParkside from '../../../assets/images/places/Hamilton, ON 308 Parkside Drive.webp'
-import mississaugaTomken from '../../../assets/images/places/Mississauga, ON 4094 Tomken Road.webp'
-import orilliaOxford from '../../../assets/images/places/Orillia, ON 175 Oxford Street.webp'
-import ottawaKennedy from '../../../assets/images/places/Ottawa, ON 360 Kennedy Lane.webp'
-import torontoLawrence2102 from '../../../assets/images/places/Toronto, ON 2102 Lawrence Avenue East.webp'
-import torontoLawrence3385 from '../../../assets/images/places/Toronto, ON 3385 Lawrence Avenue East.webp'
-import torontoSherbourne from '../../../assets/images/places/Toronto, ON 353 Sherbourne St.webp'
+import lawrence2102 from '../../../assets/images/places/2102_Lawrence.webp'
+import lawrence3385 from '../../../assets/images/places/3385_Lawrence.webp'
+import sherbourne353 from '../../../assets/images/places/353_Sherbourne.webp'
+import mainStreet1570 from '../../../assets/images/places/1570_MainStreet.webp'
+import parkside308 from '../../../assets/images/places/308_ParksideDrive.webp'
+import kennedy360 from '../../../assets/images/places/360_KennedyLane.webp'
+import tomkin4094 from '../../../assets/images/places/4094_TomkinRoad.webp'
 
-// 2102 Lawrence leads so it is the default-expanded item on the left.
+// 2102 Lawrence leads so it is the default-expanded item on the left. Names come
+// from the image filenames (the address); cities carried over from prior data.
 const PROJECTS = [
-  { location: 'TORONTO, ONTARIO', name: '2102 Lawrence Avenue East', status: 'PENDING', image: `url(${torontoLawrence2102})` },
-  { location: 'ORILLIA, ONTARIO', name: '175 Oxford Street', status: 'PENDING', image: `url(${orilliaOxford})` },
-  { location: 'HAMILTON, ONTARIO', name: '1570 Main Street West', status: 'PENDING', image: `url(${hamiltonMain})` },
-  { location: 'MISSISSAUGA, ONTARIO', name: '4094 Tomken Road', status: 'PENDING', image: `url(${mississaugaTomken})` },
-  { location: 'TORONTO, ONTARIO', name: '353 Sherbourne Street', status: 'PENDING', image: `url(${torontoSherbourne})` },
-  { location: 'OTTAWA, ONTARIO', name: '360 Kennedy Lane', status: 'PENDING', image: `url(${ottawaKennedy})` },
-  { location: 'HAMILTON, ONTARIO', name: '308 Parkside Drive', status: 'PENDING', image: `url(${hamiltonParkside})` },
-  { location: 'TORONTO, ONTARIO', name: '3385 Lawrence Avenue East', status: 'PENDING', image: `url(${torontoLawrence3385})` },
+  { location: 'TORONTO, ONTARIO', name: '2102 Lawrence', status: 'PENDING', image: `url(${lawrence2102})` },
+  { location: 'TORONTO, ONTARIO', name: '3385 Lawrence', status: 'PENDING', image: `url(${lawrence3385})` },
+  { location: 'TORONTO, ONTARIO', name: '353 Sherbourne', status: 'PENDING', image: `url(${sherbourne353})` },
+  { location: 'HAMILTON, ONTARIO', name: '1570 Main Street', status: 'PENDING', image: `url(${mainStreet1570})` },
+  { location: 'HAMILTON, ONTARIO', name: '308 Parkside Drive', status: 'PENDING', image: `url(${parkside308})` },
+  { location: 'OTTAWA, ONTARIO', name: '360 Kennedy Lane', status: 'PENDING', image: `url(${kennedy360})` },
+  { location: 'MISSISSAUGA, ONTARIO', name: '4094 Tomkin Road', status: 'PENDING', image: `url(${tomkin4094})` },
 ]
 
 const INITIAL = 0

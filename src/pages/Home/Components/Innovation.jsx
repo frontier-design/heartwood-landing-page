@@ -3,12 +3,15 @@ import styled from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { DotField } from '../../../components/dotfield'
 import { monoCallout, displayHeading, freightBody, colors } from '../../../themes.js'
-import innovationImage from '../../../assets/images/full-screen-1.webp'
-import innoGreenRoofs from '../../../assets/images/innovation/fr-1.webp'
-import innoSolar from '../../../assets/images/innovation/fr-2.webp'
-import innoGeothermal from '../../../assets/images/innovation/fr-3.webp'
-import innoMassTimber from '../../../assets/images/innovation/fr-4.webp'
-import innoPrefab from '../../../assets/images/innovation/fr-5.webp'
+import innovationImage from '../../../assets/images/hover-dots/innovation_background.webp'
+import innoSolar from '../../../assets/images/hover-dots/rooftop-solar.jpeg'
+import innoGreenRoofs from '../../../assets/images/hover-dots/green-roof.jpeg'
+import innoSmartControl from '../../../assets/images/hover-dots/smart_connect.jpeg'
+import innoPrefab from '../../../assets/images/hover-dots/prefebraction-ready-envelope.jpeg'
+import innoMassTimber from '../../../assets/images/hover-dots/mass-timber.jpeg'
+import innoGeothermal from '../../../assets/images/hover-dots/low-energy.jpeg'
+import innoCommunity from '../../../assets/images/hover-dots/community-space.jpeg'
+import innoPlaygrounds from '../../../assets/images/hover-dots/playground.jpeg'
 
 const Section = styled.section`
   position: relative;
@@ -53,6 +56,7 @@ const Body = styled.p`
   ${freightBody}
   margin: clamp(1.5rem, 3vh, 2.25rem) 0 0;
   color: ${colors.black};
+  text-wrap: pretty;
 `
 
 // The visual: the render sits as a canvas background with labelled marker dots
@@ -79,6 +83,17 @@ const Stage = styled.div`
   background-position: center;
   overflow: clip;
 
+  /* Brand-brown wash over the render (the tint used to be baked into the old
+     image). Sits above the image but below the dot field + labels. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #3a2316;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
   /* Mobile: drop the letterboxed ratio and fill the visible viewport height. */
   @media ${GRID.MEDIA_MOBILE} {
     aspect-ratio: auto;
@@ -104,49 +119,85 @@ const FIELDS = [
   {
     title: 'ROOFTOP SOLAR PV',
     lines: 'ROOFTOP\nSOLAR PV',
-    x: 37,
-    y: 20,
+    x: 18,
+    y: 16,
     card: 'below',
     image: innoSolar,
-    desc: 'Panels are installed on roofs, contributing to on-site renewable energy, building resiliency, and a reduced burden on the electrical grid.',
+    desc: 'Reduces energy costs for building operations and improves resilience to changes in the electrical grid.',
   },
   {
     title: 'GREEN ROOFS',
     lines: 'GREEN\nROOFS',
-    x: 77,
+    x: 48,
     y: 14,
     card: 'below',
-    flip: true,
     image: innoGreenRoofs,
-    desc: 'Green roofs used where solar is not installed, contributing to biodiversity, cooler cities, and stormwater management.',
+    desc: 'Improving insulation, passively managing stormwater, and reducing urban heat island effects.',
   },
   {
-    title: 'PREFABRICATED BUILDING ENVELOPES',
-    lines: 'PREFABRICATED\nBUILDING ENVELOPES',
-    x: 15,
-    y: 55,
-    card: 'above',
-    image: innoPrefab,
-    desc: 'Through continuous insulation, proper air-tightness, and triple-glazed windows, energy requirements drop and thermal comfort and resiliency increase, improving resilience to cold weather and power interruptions.',
-  },
-  {
-    title: 'MASS TIMBER AND LOW-CARBON BUILDING MATERIALS',
-    lines: 'MASS TIMBER AND\nLOW-CARBON MATERIALS',
-    x: 66,
-    y: 50,
-    card: 'above',
+    title: 'SMART AND CONNECTED BUILDING CONTROL',
+    lines: 'SMART & CONNECTED\nBUILDING CONTROL',
+    x: 80,
+    y: 18,
+    card: 'below',
     flip: true,
-    image: innoMassTimber,
-    desc: 'Natural, low-carbon building materials, such as mass timber structures and low-embodied carbon concrete, reduce the embodied carbon of the construction process compared to typical methods while also adding speed of construction and beauty to projects.',
+    image: innoSmartControl,
+    desc: 'From energy and security to mechanical systems, Heartwood utilizes cloud-based controls to monitor, operate, and automate our buildings, improving performance and reducing operating costs.',
   },
   {
-    title: 'GEOTHERMAL HEATING AND COOLING',
-    lines: 'GEOTHERMAL HEATING\nAND COOLING',
-    x: 44,
+    title: 'PREFABRICATION-READY BUILDING ENVELOPES',
+    lines: 'PREFABRICATION-READY\nBUILDING ENVELOPES',
+    x: 14,
+    y: 48,
+    card: 'side',
+    image: innoPrefab,
+    desc: 'Shortens construction timeframe and improves performance, saving costs in construction and operations. Decreases energy usage intensity, improves comfort and tenant satisfaction.',
+  },
+  {
+    title: 'PREFABRICATED MASS TIMBER',
+    lines: 'PREFABRICATED\nMASS TIMBER',
+    x: 46,
+    y: 50,
+    card: 'side',
+    image: innoMassTimber,
+    desc: 'Repeatable mass-timber structures improve construction speed and reduce costs. Mass timber is also a natural, biophilic building material that is local, beautiful, long-lasting, and desirable to our residents.',
+  },
+  {
+    title: 'LOW-ENERGY, DURABLE HEATING AND COOLING',
+    lines: 'LOW-ENERGY DURABLE\nHEATING & COOLING',
+    x: 82,
+    y: 46,
+    card: 'side',
+    flip: true,
+    image: innoGeothermal,
+    desc: 'Heat pump-based systems deliver 3–4 times greater energy efficiency than traditional gas boiler systems, while also reducing maintenance and operating costs.',
+  },
+  {
+    title: 'COMMUNITY SPACE',
+    lines: 'COMMUNITY\nSPACE',
+    x: 20,
+    y: 80,
+    card: 'above',
+    image: innoCommunity,
+    desc: 'In an age of technology and increasing social isolation, we intentionally design shared space that brings people together and fosters connection.',
+  },
+  {
+    title: 'PLAYGROUNDS & GARDENS',
+    lines: 'PLAYGROUNDS\n& GARDENS',
+    x: 50,
     y: 82,
     card: 'above',
-    image: innoGeothermal,
-    desc: 'These lower-maintenance systems can be 3 to 4× more energy efficient than traditional gas boilers. They eliminate on-site carbon, improve air quality, and free roof area for solar panels and green roofs.',
+    image: innoPlaygrounds,
+    desc: 'Access to the outdoors and fresh food should be part of every child\u2019s and adult\u2019s life, which is why we are intentional about designing playgrounds using natural materials and gardens that yield fresh food for our residents to enjoy.',
+  },
+  {
+    title: 'WALKABLE ACCESS TO EVERYDAY ESSENTIALS',
+    lines: 'WALKABLE ACCESS TO\nEVERYDAY ESSENTIALS',
+    x: 78,
+    y: 80,
+    card: 'above',
+    flip: true,
+    desc: 'Walkable neighborhoods promote physical and mental well-being while creating more desirable places to live and supporting long-term resident retention.',
   },
 ]
 
@@ -174,25 +225,56 @@ const MarkerLabel = styled.span`
 // the card's own (invisible) region never keeps it open.
 const Card = styled.div`
   position: absolute;
-  ${(p) => (p.$flip ? 'right: 0;' : 'left: 0;')}
-  ${(p) => (p.$card === 'below' ? 'top: calc(100% + 14px);' : 'bottom: calc(100% + 14px);')}
   width: clamp(220px, 20vw, 300px);
   background-color: ${colors.gray};
   box-shadow: 0 18px 40px rgba(33, 33, 33, 0.22);
   opacity: 0;
-  transform: translateY(${(p) => (p.$card === 'below' ? '-8px' : '8px')});
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   z-index: 5;
+
+  /* 'side' opens the card horizontally beside the dot and vertically centred on
+     it, so a tall middle-row card can't run past the top/bottom of the stage.
+     'below'/'above' open down/up as before for the top and bottom rows. */
+  ${(p) =>
+    p.$card === 'side'
+      ? `
+        ${p.$flip ? 'right: calc(100% + 14px);' : 'left: calc(100% + 14px);'}
+        top: 50%;
+        transform: translate(${p.$flip ? '8px' : '-8px'}, -50%);
+      `
+      : `
+        ${p.$flip ? 'right: 0;' : 'left: 0;'}
+        ${p.$card === 'below' ? 'top: calc(100% + 14px);' : 'bottom: calc(100% + 14px);'}
+        transform: translateY(${p.$card === 'below' ? '-8px' : '8px'});
+      `}
 `
 
 const CardImage = styled.div`
+  position: relative;
   width: 100%;
   aspect-ratio: 3 / 2;
-  background-image: url(${(p) => p.$image});
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url(${(p) => p.$image});
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(1);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: ${colors.gold};
+    mix-blend-mode: multiply;
+    opacity: 0.75;
+  }
 `
 
 const CardTitle = styled.p`
@@ -221,7 +303,7 @@ const Marker = styled.div`
 
   &:hover ${Card} {
     opacity: 1;
-    transform: translateY(0);
+    transform: ${(p) => (p.$card === 'side' ? 'translate(0, -50%)' : 'translateY(0)')};
   }
 `
 
@@ -265,12 +347,12 @@ function Innovation() {
         <Left $start={1} $span={5} $spanTablet={5} $spanMobile={4}>
           <Eyebrow>INNOVATION</Eyebrow>
           <Heading>
-            Innovation, to us, means building and operating with the future in
-            mind.
+            Innovation, to us, is practical: it&rsquo;s building and operating
+            with the future in mind.
           </Heading>
           <Body>
-            Our intelligence helps us identify innovation opportunities that
-            deliver more resilient assets.
+            Our intelligence platform helps us identify opportunities worth
+            acting on.
           </Body>
         </Left>
         <Media $start={1} $span={12} $rowStart={2} $spanTablet={8} $spanMobile={4}>
@@ -294,10 +376,11 @@ function Innovation() {
                   ref={(el) => (markerRefs.current[i] = el)}
                   $x={f.x}
                   $y={f.y}
+                  $card={f.card}
                 >
                   <MarkerLabel>{f.lines}</MarkerLabel>
                   <Card $card={f.card} $flip={f.flip}>
-                    <CardImage $image={f.image} />
+                    {f.image && <CardImage $image={f.image} />}
                     <CardTitle>{f.title}</CardTitle>
                     <CardDesc>{f.desc}</CardDesc>
                   </Card>

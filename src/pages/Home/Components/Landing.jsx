@@ -139,9 +139,9 @@ function Landing() {
           </Field>
           <Overlay>
             <Tagline>
-              HEARTWOOD IS A NEXT-GENERATION REAL ESTATE PLATFORM FOCUSED ON
-              ENDURING BUILDINGS, HEALTHIER HOMES, STRONGER COMMUNITIES, AND
-              DURABLE INVESTMENT RETURNS.
+              Partnering to create durable real estate investments and enduring
+              returns through buildings that last, healthier homes, and stronger
+              communities.
             </Tagline>
             <Corner>
               FUTURE

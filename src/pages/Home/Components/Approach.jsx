@@ -177,7 +177,8 @@ const Heading = styled.h2`
 const Body = styled.p`
   ${freightBody}
   margin: clamp(1.5rem, 3vh, 2.25rem) 0 0;
-  color: ${colors.white};
+  color: ${(p) => (p.$dark ? colors.white : colors.black)};
+  text-wrap: balance;
 `
 
 function Panel({ eyebrow, heading, body, dark, top, layerRef, fieldRef, image, fieldOptions }) {
@@ -208,7 +209,7 @@ function Panel({ eyebrow, heading, body, dark, top, layerRef, fieldRef, image, f
         <Column $start={1} $span={5} $spanTablet={6} $spanMobile={4}>
           <Eyebrow $dark={dark}>{eyebrow}</Eyebrow>
           <Heading $dark={dark}>{heading}</Heading>
-          {body && <Body>{body}</Body>}
+          {body && <Body $dark={dark}>{body}</Body>}
         </Column>
       </Content>
     </Layer>
@@ -263,8 +264,8 @@ function Approach() {
           dark
           image={expertiseImage}
           eyebrow="EXPERTISE"
-          heading="Vertically integrated, carrying every asset from acquisition to disposition."
-          body="The platform was built on a simple belief: a vertically integrated team across working modalities reduces risk. No information is lost at the hand-off between asset phases because every transition is supported by our intelligence and information approach. One team carries every decision through the asset’s full ownership life cycle."
+          heading="Vertically integrated, from acquisition to disposition."
+          body="Investing, building, and actively managing to create value and reduce risk. Specialists in each discipline working side by side, on shared systems, maintaining consistency throughout the life cycle. One integrated team, united by one goal: to protect and grow investor capital and deliver durable returns."
         />
         <Panel
           top
@@ -273,6 +274,7 @@ function Approach() {
           fieldOptions={scatterOpts}
           eyebrow="A RESILIENT APPROACH"
           heading="Responsive intelligence and systems-level real estate innovations."
+          body="Our platform integrates real estate expertise, data intelligence and a drive toward innovation."
         />
       </Section>
     </Track>

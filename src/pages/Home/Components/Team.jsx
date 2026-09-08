@@ -2,16 +2,19 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, freightBody, colors } from '../../../themes.js'
-import timBlair from '../../../assets/images/people/tim-blair.webp'
-import davidConstable from '../../../assets/images/people/david-constable.webp'
-import georgeTheuvenet from '../../../assets/images/people/George Theneuvenet.webp'
-import rebekahTobias from '../../../assets/images/people/Rebekah Tobias.webp'
-import janeChan from '../../../assets/images/people/Jane Chan.webp'
-import dylanKent from '../../../assets/images/people/Dylan Kent.webp'
-import carlyForrester from '../../../assets/images/people/Carly Forrester.webp'
-import nicolasGreen from '../../../assets/images/people/Nicolas Green.webp'
-import geoffreyTurnbull from '../../../assets/images/people/Geoffrey Turnbull.webp'
-import jonathanGraham from '../../../assets/images/people/Jonathan Graham.webp'
+import timBlair from '../../../assets/images/people/Tim.webp'
+import davidConstable from '../../../assets/images/people/David.webp'
+import georgeTheuvenet from '../../../assets/images/people/George.webp'
+import rebekahTobias from '../../../assets/images/people/Rebekah.webp'
+import dylanKent from '../../../assets/images/people/Dylan_Kent.webp'
+import cole from '../../../assets/images/people/Cole.webp'
+import dylan from '../../../assets/images/people/Dylan.webp'
+import jordan from '../../../assets/images/people/Jordan.webp'
+import matt from '../../../assets/images/people/Matt.webp'
+import mikeFreeland from '../../../assets/images/people/Mike_Freeland.webp'
+import mikeP from '../../../assets/images/people/Mike_P.webp'
+import radhika from '../../../assets/images/people/Radhika.webp'
+import yulia from '../../../assets/images/people/Yulia.webp'
 
 const MEMBERS = [
   {
@@ -28,14 +31,41 @@ const MEMBERS = [
     bio: 'David has over 20 years of experience in international architecture and real estate development, having completed $5B in project design and management, with a priority on low carbon, design excellence.',
     education: 'Rhode Island School of Design\nMcGill University, School of Architecture',
   },
-  { name: 'George Theuvenet', role: 'SENIOR ADVISOR', image: georgeTheuvenet },
-  { name: 'Rebekah Tobias', role: 'SENIOR ADVISOR', image: rebekahTobias },
-  { name: 'Jane Chan', role: 'VICE PRESIDENT, CAPITAL AND CORPORATE DEVELOPMENT', image: janeChan },
-  { name: 'Dylan Kent', role: 'DIRECTOR, CAPITAL MARKETS', image: dylanKent },
-  { name: 'Carly Forrester', role: 'DIRECTOR, DEVELOPMENT AND PLANNING', image: carlyForrester },
-  { name: 'Nicolas Green', role: 'DIRECTOR, CONSTRUCTION', image: nicolasGreen },
-  { name: 'Geoffrey Turnbull', role: 'DIRECTOR, INNOVATION AND SUSTAINABILITY', image: geoffreyTurnbull },
-  { name: 'Jonathan Graham', role: 'MANAGER, BUILDING PERFORMANCE', image: jonathanGraham },
+  {
+    name: 'George Theuvenet',
+    role: 'SENIOR ADVISOR',
+    image: georgeTheuvenet,
+    bio: '30+ years experience in financial institutions, real estate, investor relations and capital raising.',
+    education: 'LLM, Erasmus University, Rotterdam\nJD, Fordham University, NYC\nExecutive Education at Columbia, Kellogg, Berkeley, Stanford',
+  },
+  {
+    name: 'Rebekah Tobias',
+    role: 'SENIOR ADVISOR',
+    image: rebekahTobias,
+    bio: '20+ years of real estate and investment experience.',
+    education: 'MSc, Real Estate, Kingston University, UK\nBA in English, San Diego State University',
+  },
+  {
+    name: 'Dylan Kent',
+    role: 'DIRECTOR, CAPITAL MARKETS',
+    image: dylanKent,
+    bio: '10+ years in finance, real estate, and capital raising.',
+    education: 'FINRA Certifications, CSC\nB.Sc., University of Maryland Baltimore County',
+  },
+  {
+    name: 'Jordan Winter',
+    role: 'VICE PRESIDENT, FINANCE',
+    image: jordan,
+    bio: '10+ years in corporate finance, real estate, and accounting.',
+    education: 'CPA, CA\nMMPA University of Toronto\nBA (Economics), University of Western Ontario',
+  },
+  { name: 'Cole Cameron', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: cole },
+  { name: 'Matthew Sardellitti', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: matt },
+  { name: 'Mike Prapavessis', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: mikeP },
+  { name: 'Dylan Delli Colli', role: 'DATA SCIENCE LEAD', image: dylan },
+  { name: 'Radhika Gurav', role: 'SENIOR CORPORATE ACCOUNTANT', image: radhika },
+  { name: 'Yuliia Voznyak', role: 'MANAGER, PROPERTY ACCOUNTING', image: yulia },
+  { name: 'Mike Freeland', role: 'SENIOR PM, CONSTRUCTION', image: mikeFreeland },
 ]
 
 const HAIRLINE = 'rgba(237, 237, 237, 0.14)'
@@ -260,8 +290,8 @@ function Team() {
         <Intro $start={1} $span={6} $spanTablet={6} $spanMobile={4}>
           <Eyebrow>OUR TEAM</Eyebrow>
           <Lede>
-            Our diverse team of interdisciplinary experts are united by one goal:
-            maximizing wealth creation for our investors.
+            Our team brings together specialists from across real estate, each
+            with deep experience in their disciplines.
           </Lede>
         </Intro>
         <List>

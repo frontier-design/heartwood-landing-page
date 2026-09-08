@@ -139,7 +139,7 @@ function Invest() {
         </Left>
         <Panel $start={7} $span={6} $startTablet={1} $spanTablet={8} $spanMobile={4}>
           <Eyebrow $color={colors.black}>INVEST WITH US</Eyebrow>
-          <Heading>Build the next generation of real estate with us.</Heading>
+          <Heading>Own the future of real estate with us.</Heading>
           {/* Not wired to a backend — presentational only. */}
           <Form onSubmit={(e) => e.preventDefault()}>
             {FIELDS.map((f) => (

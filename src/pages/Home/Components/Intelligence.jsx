@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { DotField, ringGeometry } from '../../../components/dotfield'
-import { monoCallout, displayHeading, colors } from '../../../themes.js'
+import { monoCallout, displayHeading, freightBody, colors } from '../../../themes.js'
 import intelligenceImage from '../../../assets/images/other-web/intelligence.webp'
 
 // Four concentric rings. The innermost (700 dots, stray 1) fills a dense disc —
@@ -56,6 +56,12 @@ const Eyebrow = styled.p`
 const Heading = styled.h2`
   ${displayHeading}
   margin: 0;
+  color: ${colors.black};
+`
+
+const Body = styled.p`
+  ${freightBody}
+  margin: clamp(1.5rem, 3vh, 2.25rem) 0 0;
   color: ${colors.black};
 `
 
@@ -147,9 +153,17 @@ function Intelligence() {
         <Left $start={1} $span={5} $spanTablet={4} $spanMobile={4}>
           <Eyebrow>INTELLIGENCE</Eyebrow>
           <Heading>
-            Real-time advanced analytics capabilities give our team the clarity
-            and conviction to make smarter decisions and drive returns.
+            Real time market, cost, demographic, climate, and building
+            performance data in one place.
           </Heading>
+          <Body>
+            Our intelligence platform consolidates, validates, and organizes
+            these sources into a single environment, resolved to a specific site
+            across neighbourhood, municipal, and metro geographies. Letting our
+            team see how a market, a site, and a building&rsquo;s actual
+            performance relate to one another, and make decisions with that
+            holistic picture rather than fragments.
+          </Body>
         </Left>
         <Right $start={6} $span={7} $startTablet={5} $spanTablet={4} $spanMobile={4}>
           <Stage>
