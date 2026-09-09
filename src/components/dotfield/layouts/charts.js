@@ -14,7 +14,6 @@ function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, v));
 }
 
-// Box–Muller on the seeded PRNG (stands in for p5.randomGaussian).
 function gaussian(random, mean = 0, sd = 1) {
   let u = 0;
   let v = 0;
@@ -30,8 +29,6 @@ function ticks(min, max, step) {
   return out;
 }
 
-// Uniform scale that fits a natural (px) footprint inside the canvas minus
-// the label padding. Never scales up unless the caller asks via opts.scale.
 function fitScale(naturalW, naturalH, w, h, pad, opts) {
   const user = opts.scale ?? 1;
   if (opts.fit === false) return user;
@@ -46,7 +43,6 @@ function fitScale(naturalW, naturalH, w, h, pad, opts) {
   );
 }
 
-// Centre of the dot area, shifted so the chart *plus its labels* is centred.
 function centre(w, h, pad, opts) {
   return {
     cx: opts.cx ?? w / 2 + (pad.l - pad.r) / 2,
@@ -62,14 +58,6 @@ function textOpts(opts) {
   return o;
 }
 
-// ─── Bar chart (stacked, "TEUI vs utility cost") ─────────────────────────────
-// Each bar is a `barCols`-wide column of dots; rows below `base` are dimmed.
-//   bars      — [{ label, total, base }] in data units
-//   yMin/yMax — data range mapped onto `rows` dot rows
-//   barCols   — dots across each bar (default 5)
-//   diam, gap — dot size / spacing (default 10 / 3)
-//   dimAlpha  — alpha of the base segment (default 100)
-//   yTicks | yStep, yLabel, legend: [fullLabel, dimLabel]
 export function barChartLayout(count, w, h, opts = {}) {
   const p = withPreset(chartPresets.barChart, opts);
   const bars = p.bars;
@@ -145,13 +133,6 @@ export function barChartLayout(count, w, h, opts = {}) {
   return { positions, layout };
 }
 
-// ─── Simple bars (grid of cols × rows, filled from the bottom) ───────────────
-//   cols, rows — grid dimensions (default 10 × 10)
-//   values     — bar heights in rows (0..rows); random when omitted
-//   labels     — column labels (default month names)
-//   diam, gap  — dot size / spacing (default 20 / 6)
-//   dimAlpha   — alpha of the unfilled cells (default 51)
-//   legend     — [filledLabel, dimLabel]
 export function simpleBarsLayout(count, w, h, opts = {}) {
   const p = withPreset(chartPresets.simpleBars, opts);
   const random = p.rand ?? Math.random;
@@ -210,14 +191,6 @@ export function simpleBarsLayout(count, w, h, opts = {}) {
   return { positions, layout };
 }
 
-// ─── Heatmap (calendar-style, column-major) ──────────────────────────────────
-//   rows      — cells per column (default 7 = days)
-//   cols      — columns; derived from `cells` (default 240) when omitted
-//   values    — per-cell intensity 0..1 (column-major); random when omitted
-//   levels, weights — discrete alpha levels and their pick weights
-//   diam, gap — dot size / spacing (default 14 / 3)
-//   rowLabels, colLabels — defaults: Mon/Wed/Fri/Sun and month names
-//   legend    — [lowLabel, highLabel]
 export function heatmapLayout(count, w, h, opts = {}) {
   const p = withPreset(chartPresets.heatmap, opts);
   const random = p.rand ?? Math.random;
@@ -279,19 +252,13 @@ export function heatmapLayout(count, w, h, opts = {}) {
     rowLabels: p.rowLabels,
     colLabels: p.colLabels ?? chartPresets.months,
     legend: p.legend,
-    // Column-major order + a longer stagger gives the left→right sweep.
+
     stagger: p.stagger,
     ...textOpts(p),
   };
   return { positions, layout };
 }
 
-// ─── Dot plot (before/after per category, joined by faint connectors) ────────
-//   categories — [{ label, before, after }] in data units
-//   xMin/xMax  — data range across `chartW`
-//   chartW, rowHeight — natural px sizes (default 320 / 28)
-//   diam, connectorDiam, connectorGap
-//   xTicks | xStep, xLabel, legend: [beforeLabel, afterLabel]
 export function dotPlotLayout(count, w, h, opts = {}) {
   const p = withPreset(chartPresets.dotPlot, opts);
   const categories = p.categories;
@@ -352,14 +319,6 @@ export function dotPlotLayout(count, w, h, opts = {}) {
   return { positions, layout };
 }
 
-// ─── Scatter plot (x/y axes with ticks) ──────────────────────────────────────
-// Uses `count` (engine-thinned) points unless `points` is given.
-//   points      — [{ x, y, alpha?, diam?, color? }] in data units
-//   xMin/xMax, yMin/yMax — data range
-//   xTicks, yTicks, xLabel, yLabel
-//   formatX/formatY — tick formatters (v) => string
-//   maxChartW/maxChartH, minChartW/minChartH — plot area bounds in px
-//   diam — dot diameter (default 9)
 function defaultFormatX(v) {
   return v >= 1000 ? Math.round(v / 1000) + "K" : String(v);
 }
@@ -392,8 +351,7 @@ export function scatterPlotLayout(count, w, h, opts = {}) {
 
   let points = p.points;
   if (!points) {
-    // Synthetic upward trend with gaussian noise (the sketch's demo data):
-    // x spans ~2%..91% of the range, y rises 0.14 → 0.86 of the range.
+
     points = [];
     const xr = xMax - xMin;
     const yr = yMax - yMin;
@@ -440,11 +398,6 @@ export function scatterPlotLayout(count, w, h, opts = {}) {
   return { positions, layout };
 }
 
-// ─── Beeswarm (grouped distributions, collision-packed) ──────────────────────
-//   groups — [{ label, count, mean, sd, values? }]; `values` (data units)
-//            bypasses the gaussian sampling
-//   yMin/yMax, yTicks | yStep
-//   diam — dot diameter (default 8)
 export function beeswarmLayout(count, w, h, opts = {}) {
   const p = withPreset(chartPresets.beeswarm, opts);
   const random = p.rand ?? Math.random;
@@ -471,7 +424,6 @@ export function beeswarmLayout(count, w, h, opts = {}) {
   const maxHorz = Math.max(step * 10, chartW / (n * 1.75) - diam * 0.35);
   const colCenters = groups.map((_, gi) => ox + chartW * ((gi + 0.5) / n));
 
-  // Candidate x offsets: centre first, then alternating outward.
   const tries = [0];
   for (let ring = 1; ring <= 48; ring++) tries.push(ring * step, -ring * step);
 
@@ -532,10 +484,6 @@ export function beeswarmLayout(count, w, h, opts = {}) {
   return { positions, layout };
 }
 
-// ─── Timeline (milestone dots on a dotted rule) ──────────────────────────────
-//   milestones — [{ t: 0..1, label }]
-//   maxWidth   — rule length cap in px (default 560); margin — side inset (48)
-//   smallDiam, bigDiam, gap, dimAlpha
 export function timelineLayout(count, w, h, opts = {}) {
   const p = withPreset(chartPresets.timeline, opts);
   const milestones = p.milestones;
@@ -573,7 +521,6 @@ export function timelineLayout(count, w, h, opts = {}) {
   for (let i = 0; i < milestones.length; i++)
     positions.push({ x: mx[i], y: cy, alpha: 255, diam: bigDiam });
 
-  // Left→right order so a staggered transition draws the rule across.
   positions.sort((a, b) => (a.x !== b.x ? a.x - b.x : a.diam - b.diam));
 
   const layout = {

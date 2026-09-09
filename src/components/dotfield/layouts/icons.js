@@ -74,8 +74,6 @@ function orderCells(cells, order, g, random) {
   return out;
 }
 
-// `count` is intentionally ignored: an icon has exactly as many dots as lit
-// cells, and thinning it for density would break the glyph.
 export function iconLayout(count, w, h, opts = {}) {
   const random = opts.rand ?? Math.random;
   const g = iconGeometry(w, h, opts);

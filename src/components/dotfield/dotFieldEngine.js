@@ -6,12 +6,9 @@ const WANDER_NOISE_TIME_SCALE = 0.0032;
 const WANDER_SPEED_MIN = 0.01;
 const WANDER_SPEED_MAX = 0.15;
 const SEEK_DURATION_MS = 900;
-// Total spread of per-dot start delays across a transition. Each dot begins its
-// ease at (i / (n - 1)) * MAX_STAGGER_MS, so the field flows between states
-// rather than snapping all at once (mirrors playback-engine.js).
+
 const MAX_STAGGER_MS = 300;
-// Continuous scrub: 0-duration holds so the whole scroll range morphs between
-// states with no still stretches. getSegmentAndPhase skips 0-duration phases.
+
 const HOLD_MS = 0;
 const CURSOR_INFLUENCE_RADIUS = 110;
 const CURSOR_MAX_PUSH = 16;
@@ -21,8 +18,6 @@ function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-// Per-dot start delay so a transition flows across the field rather than moving
-// every dot at once (mirrors playback-engine.js).
 function getStaggerDelay(i, n) {
   return n <= 1 ? 0 : (i / (n - 1)) * MAX_STAGGER_MS;
 }
@@ -31,9 +26,6 @@ function getTransitionMs() {
   return MAX_STAGGER_MS + SEEK_DURATION_MS;
 }
 
-// Mulberry32 seeded PRNG → deterministic [0,1). Re-seeding before each layout
-// build means a resize reproduces the same arrangement (scaled), instead of
-// re-rolling Math.random() and reshuffling every dot.
 function mulberry32(seed) {
   let t = seed >>> 0;
   return function () {
@@ -47,18 +39,15 @@ function mulberry32(seed) {
 export class DotFieldEngine {
   constructor(config = {}) {
     this.count = config.count ?? 100;
-    // Base (author-set) dot size. The effective diameter gets a gentle
-    // viewport-driven multiplier (see _applyDiameterScale) so smaller screens
-    // read a touch smaller without a remount.
+
     this.baseDotDiameter = config.dotDiameter ?? 8;
     this.wanderEnabled = config.wander ?? true;
     this.cursorEnabled = config.cursor ?? true;
     this.driftAmp = config.drift ?? 2;
-    // Multiplier on every state's dot count so the field can thin out on small
-    // viewports without a remount. 1 = the configured counts (the ceiling).
+
     this.densityScale = config.densityScale ?? 1;
     this._applyDiameterScale();
-    // Fixed per-instance seed so layouts stay put across resizes.
+
     this.seed =
       (config.seed ?? Math.floor(Math.random() * 0xffffffff)) >>> 0 || 1;
     this.dots = [];
@@ -70,9 +59,7 @@ export class DotFieldEngine {
       ? { name: config.layout, opts: config.layoutOptions ?? {} }
       : null;
     this._pending = this._current;
-    // Ordered "keyframe" states for the scrub timeline. Each is a layout that
-    // the scroll position interpolates between via seek(). Falls back to the
-    // single configured layout so the trigger-based path keeps working.
+
     this.states =
       Array.isArray(config.states) && config.states.length
         ? config.states.map((s) => ({
@@ -82,20 +69,16 @@ export class DotFieldEngine {
         : this._current
           ? [this._current]
           : [];
-    // Per-state { positions, meta } resolved at the current size.
+
     this._stateCache = [];
     this._scrubActive = false;
     this._scrubProgress = 0;
-    // Overlay bookkeeping. Trigger path: the active overlay fades in once the
-    // dots have landed while the previous one fades out. Scrub path: derived
-    // from the from/to states on each seek().
+
     this._overlay = null;
     this._overlayPrev = null;
     this._scrubOverlay = null;
   }
 
-  // Distinct RNG stream per state so two same-named layouts don't produce an
-  // identical arrangement.
   _seedForState(i) {
     return (this.seed ^ (i * 0x9e3779b9)) >>> 0 || 1;
   }
@@ -157,9 +140,6 @@ export class DotFieldEngine {
     }
   }
 
-  // Gentle viewport-driven dot-size multiplier. densityScale runs ~0.35..1, so
-  // this maps to ~0.9..1 — small screens shrink the dots only slightly (never
-  // vanishing), and at full density (1) the base size is preserved exactly.
   _diameterScale() {
     return 0.85 + 0.15 * this.densityScale;
   }
@@ -173,16 +153,14 @@ export class DotFieldEngine {
     this._p = p;
     this.w = w;
     this.h = h;
-    // DotField sets engine.densityScale directly before calling resize(), so
-    // re-derive the effective dot size here to track the new viewport bucket.
+
     this._applyDiameterScale();
     for (const d of this.dots) {
       d.x = p.constrain(d.x, this.dotR, Math.max(this.dotR, w - this.dotR));
       d.y = p.constrain(d.y, this.dotR, Math.max(this.dotR, h - this.dotR));
     }
     this._stateCache = [];
-    // Re-resolve for the new dimensions: re-scrub at the same progress when the
-    // field is scroll-driven, otherwise snap the active layout (no animation).
+
     if (this._scrubActive) this.seek(this._scrubProgress);
     else if (this._current)
       this.setLayout(p, this._current.name, this._current.opts, {
@@ -190,9 +168,6 @@ export class DotFieldEngine {
       });
   }
 
-  // Adjust the viewport-driven density multiplier and rebuild live: re-scrub at
-  // the current progress when scroll-driven, otherwise snap the active layout.
-  // No remount, so the field just gains/sheds dots in place.
   setDensityScale(scale) {
     const s = Math.max(0.05, scale || 1);
     if (Math.abs(s - this.densityScale) < 1e-3) return;
@@ -207,8 +182,6 @@ export class DotFieldEngine {
     }
   }
 
-  // Declare the ordered states the scrub timeline interpolates between. Does not
-  // animate — seek() drives the field afterwards.
   setStates(states) {
     this.states = (states ?? []).map((s) => ({
       name: s.name ?? s.layout,
@@ -217,9 +190,6 @@ export class DotFieldEngine {
     this._stateCache = [];
   }
 
-  // Run a layout generator at the current size and normalise its result to
-  // { positions, meta }. Layouts return either a bare positions array or
-  // { positions, layout } when they carry overlay metadata.
   _build(name, opts, total, rand) {
     const build = layouts[name];
     if (!build) return { positions: [], meta: null };
@@ -232,8 +202,6 @@ export class DotFieldEngine {
     return { positions: result?.positions ?? [], meta: result?.layout ?? null };
   }
 
-  // Resolve (and cache) a scrub state at the current size. The per-state seed
-  // keeps arrangements deterministic across resizes.
   _resolveState(index) {
     if (this._stateCache[index]) return this._stateCache[index];
     const state = this.states[index];
@@ -328,8 +296,6 @@ export class DotFieldEngine {
     };
   }
 
-  // Scrub driver: deterministically position every dot for a 0..1 progress,
-  // reversibly (mirrors playback-engine.js seekTo / snapToInterpolated).
   seek(progress) {
     this._scrubProgress = Math.max(0, Math.min(1, progress));
     this._scrubActive = true;
@@ -446,7 +412,7 @@ export class DotFieldEngine {
       return;
     }
     if (!layouts[name]) return;
-    // opts.count lets a stage use fewer/more dots than the base count.
+
     const total = Math.max(
       0,
       Math.round((opts.count ?? this.count) * this.densityScale),
@@ -458,8 +424,6 @@ export class DotFieldEngine {
       mulberry32(this.seed),
     );
 
-    // A layout may ask for a specific stagger spread (e.g. the heatmap's
-    // left→right sweep); explicit opts/control still win.
     const transition = { ...opts, ...control };
     if (meta?.stagger != null && opts.stagger == null)
       transition.stagger = meta.stagger;
@@ -468,8 +432,6 @@ export class DotFieldEngine {
     this._transitionTo(p, positions, transition);
   }
 
-  // Swap the active overlay for the trigger path. The new one fades in after
-  // the dots have landed (stagger + seek), the old one fades out immediately.
   _setOverlay(p, meta, transition = {}) {
     const now = p.millis();
     if (transition.instant) {
@@ -489,17 +451,13 @@ export class DotFieldEngine {
     this._overlay = { meta, t0: now + delay };
   }
 
-  // Draw the chart overlays (axes, ticks, legends) for the active state(s).
-  // Call after the dots so labels sit on top. `rgb` is the dot colour as
-  // { r, g, b }; overlays fall back to it for text.
   drawOverlays(p, rgb) {
     const w = this.w;
     const h = this.h;
     const render = (meta, fadeT) => {
       const fn = meta && overlayRenderers[meta.overlay];
       if (!fn || fadeT <= 0) return;
-      // Prefer the loaded p5.Font (real family name registered on the canvas)
-      // over the CSS-alias string, which native fillText can't resolve.
+
       const m = this.overlayFont ? { ...meta, font: this.overlayFont } : meta;
       p.push();
       fn(p, m, Math.min(1, fadeT), rgb, w, h);
@@ -512,8 +470,7 @@ export class DotFieldEngine {
       if (s.phase === "hold") {
         render(s.from, 1);
       } else {
-        // Mirrors playback-engine.js: outgoing labels leave in the first
-        // quarter of the morph, incoming labels arrive in the last quarter.
+
         render(s.from, Math.max(0, 1 - s.phaseT * 4));
         render(s.to, Math.max(0, Math.min(1, (s.phaseT - 0.75) * 4)));
       }
@@ -540,8 +497,6 @@ export class DotFieldEngine {
     }
   }
 
-  // Overlay metadata of the active layout (trigger path) — lets callers align
-  // DOM annotations to the chart geometry the field actually resolved.
   getLayoutMeta() {
     return this._overlay?.meta ?? null;
   }
@@ -563,12 +518,10 @@ export class DotFieldEngine {
   _transitionTo(p, positions, opts = {}) {
     const instant = opts.instant ?? false;
     const dur = instant ? 1 : Math.max(1, opts.duration ?? SEEK_DURATION_MS);
-    // Spread per-dot start delays across the whole field so it flows between
-    // states rather than snapping. Normalised by index so the total spread is
-    // constant regardless of dot count (mirrors playback-engine.js).
+
     const maxStagger = instant ? 0 : (opts.stagger ?? MAX_STAGGER_MS);
     const seekAfter = opts.seekAfter ?? "parked";
-    // Per-state dot size: opts.diam overrides the base diameter for this stage.
+
     const stateDiam = opts.diam ?? this.dotDiameter;
     const now = p.millis();
     const used = positions.length;
@@ -580,7 +533,6 @@ export class DotFieldEngine {
     for (let i = 0; i < this.dots.length; i++) {
       const d = this.dots[i];
 
-      // Surplus dots fade out and die.
       if (i >= used) {
         d.mode = "seek";
         d.seekSX = d.x;
@@ -631,8 +583,6 @@ export class DotFieldEngine {
     const my = p.mouseY;
     const ease = CURSOR_NUDGE_EASE;
 
-    // When the cursor is off-canvas it can't push any dot, so skip the O(N)
-    // distance test entirely and just relax existing nudges back to rest.
     const rad = CURSOR_INFLUENCE_RADIUS;
     if (mx < -rad || mx > this.w + rad || my < -rad || my > this.h + rad) {
       if (this._cursorAtRest) return;
@@ -674,9 +624,6 @@ export class DotFieldEngine {
     const now = p.millis();
     const t = p.frameCount * WANDER_NOISE_TIME_SCALE;
 
-    // While scroll-scrubbing, seek() has already written every dot's final
-    // position and zeroed its tween timers, so skip the wander/seek/drift and
-    // trim passes. The cursor nudge (below) stays live — it's additive.
     if (this._scrubActive) {
       if (this.cursorEnabled) this._applyCursor(p);
       return;
@@ -720,7 +667,6 @@ export class DotFieldEngine {
         }
       }
 
-      // Parked dots breathe with a small per-dot drift so the field stays alive.
       if (this.driftAmp > 0 && d.mode === "parked") {
         d.driftPhase += 0.01;
         d.driftX = Math.cos(d.driftPhase) * this.driftAmp;
@@ -755,8 +701,6 @@ export class DotFieldEngine {
       }
     }
 
-    // Trim faded-out surplus dots back down to the active target count. We keep
-    // at least the base count so a smaller stage can grow again without a remount.
     const keep = Math.max(this.count, this._targetCount);
     if (this.dots.length > keep) {
       let canTrim = true;

@@ -4,7 +4,7 @@ import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, colors } from '../../../themes.js'
 import lawrence2102 from '../../../assets/images/places/2102_Lawrence.webp'
 import lawrence3385 from '../../../assets/images/places/3385_Lawrence.webp'
-import sherbourne353 from '../../../assets/images/places/353_Sherbourne.webp'
+import sherbourne353 from '../../../assets/images/places/353_Sherbourne_base.webp'
 import mainStreet1570 from '../../../assets/images/places/1570_MainStreet.webp'
 import parkside308 from '../../../assets/images/places/308_ParksideDrive.webp'
 import kennedy360 from '../../../assets/images/places/360_KennedyLane.webp'
@@ -88,7 +88,7 @@ const Item = styled.div`
     z-index: 0;
     background: ${(p) => p.$image};
     background-size: cover;
-    background-position: center;
+    background-position: ${(p) => p.$position ?? 'center'};
   }
 
   @media ${GRID.MEDIA_MOBILE} {
@@ -210,6 +210,7 @@ function Projects() {
               key={p.name}
               $active={i === active}
               $image={p.image}
+              $position={p.position}
               onMouseEnter={() => setActive(i)}
               onClick={() => setActive(i)}
             >

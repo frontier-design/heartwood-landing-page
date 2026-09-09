@@ -17,7 +17,7 @@ const FOUR_COLS = `calc((min(${GRID.MAX_WIDTH}px, 100vw) - ${GRID.PADDING * 2 + 
 const SLIDES = [
   {
     heading: 'Resilient Buildings',
-    body: 'We own comfortable, durable, and nurturing buildings that support resident well-being where people love to live long term.',
+    body: 'Homes that are comfortable, durable, and efficient to operate — clean air, natural light, and stable temperatures that make people want to stay.',
     image: `url(${carousel1})`,
   },
   {

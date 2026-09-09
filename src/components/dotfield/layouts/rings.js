@@ -1,7 +1,5 @@
 const TWO_PI = Math.PI * 2
 
-// Per-ring density waves bias where dots gather around an orbit so they clump
-// unevenly instead of spreading evenly.
 function makeClumpWaves(random) {
   const n = 2 + Math.floor(random() * 4)
   const waves = []
@@ -15,8 +13,6 @@ function makeClumpWaves(random) {
   return waves
 }
 
-// Rejection-sample an angle weighted by the density waves. `amount` scales the
-// clumping (0 = even spacing, 1 = full clumping).
 function clumpedAngle(waves, amount, random) {
   if (amount <= 0 || waves.length === 0) return random() * TWO_PI
   for (let tries = 0; tries < 32; tries++) {
@@ -30,40 +26,6 @@ function clumpedAngle(waves, amount, random) {
   return random() * TWO_PI
 }
 
-/**
- * Concentric orbits radiating from the centre — the main "ring logic".
- * Accepts a seeded `opts.rand` so the field reproduces on resize (falls back
- * to Math.random when called standalone).
- *
- * Options:
- *   ringDotCounts — array of dots per orbit, e.g. [40, 70, 110]. Its length is
- *                   the orbit count. When omitted, `count` is split across
- *                   `rings` orbits evenly.
- *   rings         — orbit count when ringDotCounts is not given (default 3)
- *   minRadius     — radius of the innermost orbit (default 14% of min axis).
- *                   A value <= 1 is read as a fraction of the min axis (stays
- *                   responsive); a larger value is treated as pixels.
- *   maxRadius     — radius of the outermost orbit (default 44% of min axis).
- *                   Same fraction/pixel rule as minRadius.
- *   radiusScale   — multiplier on min/maxRadius to shrink or grow the whole
- *                   graph while staying responsive (default 1)
- *   radii         — explicit array of orbit radii (overrides min/maxRadius)
- *   clump         — 0..1 angular clumping (default 0.4; 0 = even spacing)
- *   stray         — 0..1 fraction of dots scattered inside the orbit (default 0.12).
- *                   May be an array (per orbit) so e.g. the innermost ring fills
- *                   into a dense disc (stray 1) while the others stay as orbits.
- *   jitter        — radial noise in px (default 10% of each orbit's radius)
- *   anchors       — fixed accent points [{ x, y, color, diam }] where x/y are
- *                   offsets from centre as fractions of the min axis (so they
- *                   scale with the graph). Appended as coloured dots.
- *   cx, cy        — centre override
- */
-/**
- * Resolve the shared geometry of a rings field (centre, min axis, and the
- * ordered orbit radii) from the same options ringsLayout uses. Exported so
- * callers can position annotations relative to the actual rings instead of
- * guessing — pass the identical opts and the field's pixel width/height.
- */
 export function ringGeometry(w, h, opts = {}) {
   const cx = opts.cx ?? w / 2
   const cy = opts.cy ?? h / 2
@@ -92,8 +54,6 @@ export function ringsLayout(count, w, h, opts = {}) {
   const clump = opts.clump ?? 0.4
   const strayOpt = opts.stray ?? 0.12
 
-  // Viewport-driven thinning: `count` is already scaled by the engine, but an
-  // explicit ringDotCounts array bypasses it, so apply the same multiplier here.
   const densityScale = opts.densityScale ?? 1
   let ringDotCounts = opts.ringDotCounts
   if (!Array.isArray(ringDotCounts) || ringDotCounts.length === 0) {
@@ -125,8 +85,6 @@ export function ringsLayout(count, w, h, opts = {}) {
     }
   }
 
-  // Fixed accent points, offset from centre in fractions of the min axis so
-  // they scale with the graph. Each carries its own colour/diameter.
   if (Array.isArray(opts.anchors)) {
     for (const a of opts.anchors) {
       positions.push({

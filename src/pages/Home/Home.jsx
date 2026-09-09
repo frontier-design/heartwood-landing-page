@@ -24,8 +24,8 @@ function Home() {
         <Innovation />
         <Resilience />
         <Projects />
-        <Invest />
         <FutureBuilt />
+        <Invest />
         <Team />
         <Footer />
       </DeferredMount>

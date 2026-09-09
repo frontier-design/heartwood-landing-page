@@ -162,7 +162,7 @@ function Intelligence() {
         <Left $start={1} $span={5} $spanTablet={4} $spanMobile={4}>
           <Eyebrow>INTELLIGENCE</Eyebrow>
           <Heading>
-            Real time market, cost, demographic, climate, and building
+            Real-time market, cost, demographic, climate, and building
             performance data in one place.
           </Heading>
           <Body>

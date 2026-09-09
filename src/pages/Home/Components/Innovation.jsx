@@ -13,6 +13,12 @@ import innoGeothermal from '../../../assets/images/hover-dots/low-energy.jpeg'
 import innoCommunity from '../../../assets/images/hover-dots/community-space.jpeg'
 import innoPlaygrounds from '../../../assets/images/hover-dots/playground.jpeg'
 
+// The px `offsetX`/`offsetY` nudges on each FIELD are tuned against this stage
+// width. The DotField scales them by (liveStageWidth / OFFSET_REF_WIDTH) so a
+// pinned dot holds its spot on the artwork as the viewport resizes. Set this to
+// the on-screen width of the innovation image at the size you placed the dots.
+const OFFSET_REF_WIDTH = 1440
+
 const Section = styled.section`
   position: relative;
   width: 100vw;
@@ -121,6 +127,8 @@ const FIELDS = [
     lines: 'ROOFTOP\nSOLAR PV',
     x: 18,
     y: 16,
+    offsetX: 100,
+    offsetY: -20,
     card: 'below',
     image: innoSolar,
     desc: 'Reduces energy costs for building operations and improves resilience to changes in the electrical grid.',
@@ -130,6 +138,8 @@ const FIELDS = [
     lines: 'GREEN\nROOFS',
     x: 48,
     y: 14,
+    offsetX: 200,
+    offsetY: 270,
     card: 'below',
     image: innoGreenRoofs,
     desc: 'Improving insulation, passively managing stormwater, and reducing urban heat island effects.',
@@ -158,6 +168,7 @@ const FIELDS = [
     lines: 'PREFABRICATED\nMASS TIMBER',
     x: 46,
     y: 50,
+    offsetX: 100,
     card: 'side',
     image: innoMassTimber,
     desc: 'Repeatable mass-timber structures improve construction speed and reduce costs. Mass timber is also a natural, biophilic building material that is local, beautiful, long-lasting, and desirable to our residents.',
@@ -177,6 +188,7 @@ const FIELDS = [
     lines: 'COMMUNITY\nSPACE',
     x: 20,
     y: 80,
+    offsetX: -100,
     card: 'above',
     image: innoCommunity,
     desc: 'In an age of technology and increasing social isolation, we intentionally design shared space that brings people together and fosters connection.',
@@ -197,7 +209,7 @@ const FIELDS = [
     y: 80,
     card: 'above',
     flip: true,
-    desc: 'Walkable neighborhoods promote physical and mental well-being while creating more desirable places to live and supporting long-term resident retention.',
+    desc: 'Walkable neighbourhoods promote physical and mental well-being while creating more desirable places to live and supporting long-term resident retention.',
   },
 ]
 
@@ -310,7 +322,13 @@ const Marker = styled.div`
 function Innovation() {
   const fieldRef = useRef(null)
   const markerRefs = useRef([])
-  const anchors = FIELDS.map((f) => ({ x: f.x / 100, y: f.y / 100, color: colors.lightBlue }))
+  const anchors = FIELDS.map((f) => ({
+    x: f.x / 100,
+    y: f.y / 100,
+    offsetX: f.offsetX,
+    offsetY: f.offsetY,
+    color: colors.lightBlue,
+  }))
 
   // Track each anchor dot's live position (drift + cursor repel) and park its
   // label/card onto it every frame, so the labels ride the animated dots.
@@ -361,7 +379,7 @@ function Innovation() {
               <DotField
                 ref={fieldRef}
                 layout="scatter"
-                layoutOptions={{ count: 0, anchors }}
+                layoutOptions={{ count: 0, anchors, offsetRefWidth: OFFSET_REF_WIDTH }}
                 count={FIELDS.length}
                 dotColor={colors.lightBlue}
                 dotDiameter={9}

@@ -217,7 +217,7 @@ function Approach() {
           dark
           image={expertiseImage}
           eyebrow="EXPERTISE"
-          heading="Vertically integrated, from acquisition to disposition."
+          heading="Vertically integrated, from acquisition to realization."
           body="Investing, building, and actively managing to create value and reduce risk. Specialists in each discipline working side by side, on shared systems, maintaining consistency throughout the life cycle. One integrated team, united by one goal: to protect and grow investor capital and deliver durable returns."
         />
         <Panel
@@ -226,7 +226,7 @@ function Approach() {
           fieldRef={topFieldRef}
           fieldOptions={scatterOpts}
           eyebrow="A RESILIENT APPROACH"
-          heading="Responsive intelligence and systems-level real estate innovations."
+          heading="Responsive intelligence and systems-based discipline."
           body="Our platform integrates real estate expertise, data intelligence and a drive toward innovation."
         />
       </Section>

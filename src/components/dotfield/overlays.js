@@ -1,18 +1,3 @@
-// ─── Chart overlays ──────────────────────────────────────────────────────────
-// Labels, axes, ticks and legends drawn on top of the dots for the chart
-// layouts (ported from heartwood-tools/js/datavis/chart-overlays.js). Each
-// renderer takes the `layout` metadata its chart layout emitted:
-//
-//   render(p, layout, fadeT, rgb, w, h)
-//     p      — p5 instance
-//     layout — geometry/labels from the layout generator (see layouts/charts.js)
-//     fadeT  — 0..1 fade multiplier (the engine cross-fades overlays)
-//     rgb    — { r, g, b } fallback text colour (the field's dot colour)
-//     w, h   — canvas size
-//
-// Per-layout text options: `font` (CSS family list), `fontSize` (px),
-// `textColor` (hex; defaults to the dot colour).
-
 export const OVERLAY_FONT = "'PP Right Serif Mono', monospace"
 export const OVERLAY_FADE_MS = 500
 
@@ -27,7 +12,6 @@ function hexToRgb(hex) {
   return c
 }
 
-// Common setup: resolve colour, set the font, return helpers bound to fadeT.
 function begin(p, layout, fadeT, rgb) {
   const c = layout.textColor ? hexToRgb(layout.textColor) : rgb
   const size = layout.fontSize ?? 11
@@ -55,7 +39,6 @@ function drawBarChart(p, layout, fadeT, rgb) {
   const legRowStep = legDot + 5
   const legendAbovePad = 32
 
-  // Legend (full + dim swatches) above the bars.
   const legLeft = b.ox - b.diam / 2
   const dotCx = legLeft + legDot / 2
   const textX = legLeft + legDot + legTextGap
@@ -70,7 +53,6 @@ function drawBarChart(p, layout, fadeT, rgb) {
   fill(255)
   p.text(b.legend[1], textX, legRow2Y)
 
-  // Y ticks with faint gridlines.
   const axisLeft = b.ox - b.diam / 2
   const axisRight = b.ox + b.gridW + b.diam / 2
   const yAxisPad = 14
@@ -86,7 +68,6 @@ function drawBarChart(p, layout, fadeT, rgb) {
     p.text(String(tick), axisLeft - yAxisPad, yy)
   }
 
-  // Rotated y-axis label.
   p.push()
   p.translate(axisLeft - yAxisPad - 36, b.baseY - b.gridH / 2)
   p.rotate(-p.HALF_PI)
@@ -95,7 +76,6 @@ function drawBarChart(p, layout, fadeT, rgb) {
   p.text(b.yLabel, 0, 0)
   p.pop()
 
-  // Bar labels below the baseline.
   fill(255)
   p.noStroke()
   p.textAlign(p.CENTER, p.TOP)
@@ -135,7 +115,6 @@ function drawHeatmap(p, layout, fadeT, rgb) {
   const { fill } = begin(p, layout, fadeT, rgb)
   const labelPad = 8
 
-  // Row labels (days) on the left.
   p.textAlign(p.RIGHT, p.CENTER)
   fill(255)
   for (let r = 0; r < g.rows; r++) {
@@ -143,7 +122,6 @@ function drawHeatmap(p, layout, fadeT, rgb) {
     if (label) p.text(label, g.ox - g.diam - labelPad, g.oy + r * g.spacing)
   }
 
-  // Column labels (months) spread evenly across the columns.
   const n = g.colLabels.length
   const colsPer = g.cols / n
   p.textAlign(p.LEFT, p.BOTTOM)
@@ -152,7 +130,6 @@ function drawHeatmap(p, layout, fadeT, rgb) {
     if (col < g.cols && g.colLabels[i]) p.text(g.colLabels[i], g.ox + col * g.spacing - 2, g.oy - g.diam - labelPad)
   }
 
-  // Less ●●●●● More legend, right-aligned under the grid.
   const legendY = g.oy + g.gridH + g.diam * 2.5 + labelPad
   const legendDot = 10
   const legendGap = legendDot + 3
@@ -175,14 +152,12 @@ function drawDotPlot(p, layout, fadeT, rgb) {
   const dp = layout
   const { fill } = begin(p, layout, fadeT, rgb)
 
-  // Category labels.
   p.textAlign(p.RIGHT, p.CENTER)
   fill(255)
   for (let i = 0; i < dp.categories.length; i++) {
     p.text(dp.categories[i].label, dp.ox - dp.diam - 10, dp.oy + i * dp.rowHeight)
   }
 
-  // X ticks and axis label.
   const tickY = dp.oy + dp.chartH + 16
   p.textAlign(p.CENTER, p.TOP)
   for (const tick of dp.xTicks) {
@@ -191,7 +166,6 @@ function drawDotPlot(p, layout, fadeT, rgb) {
   }
   p.text(dp.xLabel, dp.ox + dp.chartW / 2, tickY + 18)
 
-  // Legend: dim = before, full = after.
   const legDot = 10
   const legGap = 8
   const legRowStep = legDot + 5
@@ -242,7 +216,6 @@ function drawScatterPlot(p, layout, fadeT, rgb) {
   p.text(sc.yLabel, 0, 0)
   p.pop()
 
-  // Small muted disclaimer centred under the x-axis label.
   if (sc.subtitle) {
     const base = sc.fontSize ?? 11
     p.textSize(Math.max(10, base * 0.74))
@@ -275,8 +248,6 @@ function drawTimeline(p, layout, fadeT, rgb) {
   for (const m of layout.milestones) multiline(p, m.label, m.x, m.y, size + 3)
 }
 
-// Corner legend for a plain scatter field: "TITLE / total" bottom-left and
-// "1 DOT = value UNIT" bottom-right (stacked on narrow canvases).
 function drawScatterLegend(p, layout, fadeT, rgb, w, h) {
   if (w == null || h == null) return
   const { size, fill } = begin(p, { fontSize: 12, ...layout }, fadeT, rgb)
