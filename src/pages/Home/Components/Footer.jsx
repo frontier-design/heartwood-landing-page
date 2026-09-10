@@ -265,7 +265,7 @@ function Footer() {
 
       <TopBar>
         <Contact $start={1} $span={3} $spanTablet={4} $spanMobile={4}>
-          <Line>info@heartwood.com</Line>
+          <Line>info@heartwoodinvestments.ca</Line>
           <Line>
             25 King St W, Toronto,
             <br />
