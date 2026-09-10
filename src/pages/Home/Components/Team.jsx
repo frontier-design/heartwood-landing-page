@@ -86,7 +86,7 @@ const MEMBERS = [
   { name: 'Jonathan Graham', role: 'MANAGER, BUILDING PERFORMANCE' },
   { name: 'Dylan Delli Colli', role: 'DATA SCIENCE LEAD', image: dylan },
   { name: 'Mike Freeland', role: 'SENIOR PM, CONSTRUCTION', image: mikeFreeland },
-  { name: 'Nic Green', role: '' },
+  { name: 'Nic Green', role: 'DIRECTOR, CONSTRUCTION' },
 ]
 
 const HAIRLINE = 'rgba(237, 237, 237, 0.14)'
