@@ -3,15 +3,15 @@ import styled from 'styled-components'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { DotField } from '../../../components/dotfield'
 import { monoCallout, displayHeading, freightBody, colors } from '../../../themes.js'
-import innovationImage from '../../../assets/images/hover-dots/innovation_background.webp'
+import innovationImage from '../../../assets/images/innovation/innovation-slide.webp'
 import innoSolar from '../../../assets/images/hover-dots/rooftop-solar.jpeg'
-import innoGreenRoofs from '../../../assets/images/hover-dots/green-roof.jpeg'
-import innoSmartControl from '../../../assets/images/hover-dots/smart_connect.jpeg'
+import innoGreenRoofs from '../../../assets/images/innovation/green-roof.webp'
+import innoSmartControl from '../../../assets/images/innovation/smart-building-controls.webp'
 import innoPrefab from '../../../assets/images/hover-dots/prefebraction-ready-envelope.jpeg'
 import innoMassTimber from '../../../assets/images/hover-dots/mass-timber.jpeg'
-import innoGeothermal from '../../../assets/images/hover-dots/low-energy.jpeg'
-import innoCommunity from '../../../assets/images/hover-dots/community-space.jpeg'
-import innoPlaygrounds from '../../../assets/images/hover-dots/playground.jpeg'
+import innoGeothermal from '../../../assets/images/innovation/geothermal-room.webp'
+import innoCommunity from '../../../assets/images/innovation/community-space.webp'
+import innoPlaygrounds from '../../../assets/images/innovation/playground-garden.webp'
 
 // The px `offsetX`/`offsetY` nudges on each FIELD are tuned against this stage
 // width. The DotField scales them by (liveStageWidth / OFFSET_REF_WIDTH) so a
@@ -142,6 +142,7 @@ const FIELDS = [
     offsetY: 270,
     card: 'below',
     image: innoGreenRoofs,
+    imagePosition: 'right',
     desc: 'Improving insulation, passively managing stormwater, and reducing urban heat island effects.',
   },
   {
@@ -275,7 +276,7 @@ const CardImage = styled.div`
     inset: 0;
     background-image: url(${(p) => p.$image});
     background-size: cover;
-    background-position: center;
+    background-position: ${(p) => p.$position ?? 'center'};
     filter: grayscale(1);
   }
 
@@ -398,7 +399,7 @@ function Innovation() {
                 >
                   <MarkerLabel>{f.lines}</MarkerLabel>
                   <Card $card={f.card} $flip={f.flip}>
-                    {f.image && <CardImage $image={f.image} />}
+                    {f.image && <CardImage $image={f.image} $position={f.imagePosition} />}
                     <CardTitle>{f.title}</CardTitle>
                     <CardDesc>{f.desc}</CardDesc>
                   </Card>

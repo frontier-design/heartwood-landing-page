@@ -13,13 +13,13 @@ import tomkin4094 from '../../../assets/images/places/4094_TomkinRoad.webp'
 // 2102 Lawrence leads so it is the default-expanded item on the left. Names come
 // from the image filenames (the address); cities carried over from prior data.
 const PROJECTS = [
-  { location: 'TORONTO, ONTARIO', name: '2102 Lawrence', status: 'PENDING', image: `url(${lawrence2102})` },
-  { location: 'TORONTO, ONTARIO', name: '3385 Lawrence', status: 'PENDING', image: `url(${lawrence3385})` },
-  { location: 'TORONTO, ONTARIO', name: '353 Sherbourne', status: 'PENDING', image: `url(${sherbourne353})` },
-  { location: 'HAMILTON, ONTARIO', name: '1570 Main Street', status: 'PENDING', image: `url(${mainStreet1570})` },
-  { location: 'HAMILTON, ONTARIO', name: '308 Parkside Drive', status: 'PENDING', image: `url(${parkside308})` },
-  { location: 'OTTAWA, ONTARIO', name: '360 Kennedy Lane', status: 'PENDING', image: `url(${kennedy360})` },
-  { location: 'MISSISSAUGA, ONTARIO', name: '4094 Tomkin Road', status: 'PENDING', image: `url(${tomkin4094})` },
+  { location: 'TORONTO, ONTARIO', name: '2102 Lawrence', image: `url(${lawrence2102})` },
+  { location: 'TORONTO, ONTARIO', name: '3385 Lawrence', image: `url(${lawrence3385})` },
+  { location: 'TORONTO, ONTARIO', name: '353 Sherbourne', image: `url(${sherbourne353})` },
+  { location: 'HAMILTON, ONTARIO', name: '1570 Main Street', image: `url(${mainStreet1570})` },
+  { location: 'HAMILTON, ONTARIO', name: '308 Parkside Drive', image: `url(${parkside308})` },
+  { location: 'OTTAWA, ONTARIO', name: '360 Kennedy Lane', image: `url(${kennedy360})` },
+  { location: 'MISSISSAUGA, ONTARIO', name: '4094 Tomkin Road', image: `url(${tomkin4094})` },
 ]
 
 const INITIAL = 0
@@ -144,23 +144,6 @@ const Location = styled.p`
   }
 `
 
-const Status = styled.p`
-  ${monoCallout}
-  margin: clamp(0.35rem, 0.8vh, 0.6rem) 0 0;
-  color: ${colors.gold};
-  opacity: ${(p) => (p.$active ? 1 : 0)};
-  transform: translateY(${(p) => (p.$active ? '0' : '1rem')});
-  transition:
-    opacity ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.55s' : '0s')},
-    transform ${(p) => (p.$active ? '0.9s' : '0.3s')} cubic-bezier(0.16, 1, 0.3, 1) ${(p) => (p.$active ? '0.55s' : '0s')};
-
-  @media ${GRID.MEDIA_MOBILE} {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-`
-
 const Name = styled.h3`
   ${displayHeading}
   margin: clamp(0.5rem, 1.5vh, 1rem) 0 0;
@@ -216,7 +199,6 @@ function Projects() {
             >
               <Info $active={i === active}>
                 <Location $active={i === active}>{p.location}</Location>
-                <Status $active={i === active}>{p.status}</Status>
                 <Name $active={i === active}>{p.name}</Name>
               </Info>
             </Item>

@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Grid, GridCell, GRID } from '../../../grid'
 import { monoCallout, displayHeading, freightBody, colors } from '../../../themes.js'
 import carousel1 from '../../../assets/images/carousel/carousel-1.webp'
-import carousel2 from '../../../assets/images/carousel/carousel-2.webp'
+import carousel2 from '../../../assets/images/carousel/Resilience-replacement.webp'
 import carousel3 from '../../../assets/images/carousel/carousel-3.webp'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -24,6 +24,7 @@ const SLIDES = [
     heading: 'Resilient Communities',
     body: 'Making community part of the place you live. Spaces and programming bringing humans together, so residents can thrive.',
     image: `url(${carousel2})`,
+    tint: 'linear-gradient(rgba(53, 29, 18, 0.5), rgba(53, 29, 18, 0.5))',
   },
   {
     heading: 'Resilient Investments',
@@ -59,7 +60,7 @@ const Background = styled.div`
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: ${(p) => p.$image};
+  background: ${(p) => (p.$tint ? `${p.$tint}, ${p.$image}` : p.$image)};
   background-size: cover;
   background-position: center;
   opacity: ${(p) => (p.$active ? 1 : 0)};
@@ -202,7 +203,7 @@ function Resilience() {
     <Track ref={trackRef}>
       <Section>
         {SLIDES.map((s, i) => (
-          <Background key={s.heading} $image={s.image} $active={i === active} />
+          <Background key={s.heading} $image={s.image} $tint={s.tint} $active={i === active} />
         ))}
         <Overlay />
         <Content>

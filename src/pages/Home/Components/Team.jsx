@@ -13,59 +13,80 @@ import jordan from '../../../assets/images/people/Jordan.webp'
 import matt from '../../../assets/images/people/Matt.webp'
 import mikeFreeland from '../../../assets/images/people/Mike_Freeland.webp'
 import mikeP from '../../../assets/images/people/Mike_P.webp'
-import radhika from '../../../assets/images/people/Radhika.webp'
-import yulia from '../../../assets/images/people/Yulia.webp'
 
 const MEMBERS = [
-  {
-    name: 'Tim Blair',
-    role: 'FOUNDING PARTNER',
-    image: timBlair,
-    bio: 'Tim brings 20 years of real estate investment banking and private equity experience, having completed over $8B in transactions for complex commercial and mixed-use residential developments within the Americas and Europe.',
-    education: 'Richard Ivey School of Business (MBA)\nUniversity of Waterloo, School of Planning (BES)',
-  },
   {
     name: 'David Constable',
     role: 'FOUNDING PARTNER',
     image: davidConstable,
-    bio: 'David has over 20 years of experience in international architecture and real estate development, having completed $5B in project design and management, with a priority on low carbon, design excellence.',
+    bio: 'David brings over 20 years of experience in international architecture and real estate development, having led $5B in project design and management with a focus on low-carbon, design-forward outcomes.',
     education: 'Rhode Island School of Design\nMcGill University, School of Architecture',
+  },
+  {
+    name: 'Tim Blair',
+    role: 'FOUNDING PARTNER',
+    image: timBlair,
+    bio: 'Tim brings 20 years of experience in real estate investment banking and private equity, having completed over $8B in transactions across complex commercial and mixed-use residential developments in the Americas and Europe.',
+    education: 'Richard Ivey School of Business (MBA)\nUniversity of Waterloo, School of Planning (BES)',
+  },
+  {
+    name: 'Nathan Helbach',
+    role: 'UNITED STATES',
+    bio: "Nathan brings 10 years of experience in real estate development and investing, having delivered over 2,200 multifamily units in the United States and several large-scale mass timber buildings in North America, with a focus on expanding Heartwood's strategy into the United States.",
   },
   {
     name: 'George Theuvenet',
     role: 'SENIOR ADVISOR',
     image: georgeTheuvenet,
-    bio: '30+ years experience in financial institutions, real estate, investor relations and capital raising.',
+    bio: 'George brings over 30 years of experience in financial institutions, real estate, investor relations, and capital raising, with a strong track record building and sustaining long-term relationships across international institutional markets.',
     education: 'LLM, Erasmus University, Rotterdam\nJD, Fordham University, NYC\nExecutive Education at Columbia, Kellogg, Berkeley, Stanford',
   },
   {
     name: 'Rebekah Tobias',
     role: 'SENIOR ADVISOR',
     image: rebekahTobias,
-    bio: '20+ years of real estate and investment experience.',
+    bio: 'Rebekah brings over 20 years of experience in real estate and investment, advising Heartwood on resilient European real estate strategies and drawing on deep relationships across European family offices and capital-raising networks.',
     education: 'MSc, Real Estate, Kingston University, UK\nBA in English, San Diego State University',
+  },
+  {
+    name: 'Richard Crofts',
+    role: 'SENIOR ADVISOR',
+    bio: 'Richard brings a 25+-year track record structuring and launching investment vehicles and leading complex mergers, acquisitions, and cross-border transactions. He holds the Chartered Investment Manager (CIM) designation, is a Fellow of the Canadian Securities Institute (FCSI), and was previously recognized as a "Top 40 Under 40" lawyer called to the Bar in New York State and Ontario.',
+  },
+  {
+    name: 'Cheryl Gray',
+    role: 'SENIOR ADVISOR',
+    bio: "Cheryl brings decades of institutional real estate management experience, helping clients strengthen organizational structure, sustainability initiatives, risk mitigation, and prop-tech implementation across all major asset classes. She has led corporate-wide programs and new business initiatives that translate macro-level strategy into practical execution, earning recognition including the BOMA Canada Chairman's Award, the REIC Emeritus Award, and GlobeSt's Real Estate Women of Influence Innovator of the Year Award.",
   },
   {
     name: 'Dylan Kent',
     role: 'DIRECTOR, CAPITAL MARKETS',
     image: dylanKent,
-    bio: '10+ years in finance, real estate, and capital raising.',
+    bio: 'Dylan brings over 10 years of experience in real estate capital markets across large institutions, boutique investment firms, and large-scale developers, with an entrepreneurial track record spanning startups and ventures in real estate, prop-tech, and sports & entertainment.',
     education: 'FINRA Certifications, CSC\nB.Sc., University of Maryland Baltimore County',
   },
   {
+    name: 'Dustin Buenaventura',
+    role: 'DIRECTOR, BUSINESS DEVELOPMENT',
+    bio: 'Dustin brings over a decade of experience in Canadian financial services and business development, including senior roles at Equiton, Brompton Funds, Horizons ETFs, and Sun Life Global Investments, with deep expertise across private equity, ETFs, wealth management, and alternative investments.',
+  },
+  { name: 'Kristopher Tavella', role: 'VICE PRESIDENT, DEVELOPMENT AND INVESTMENTS' },
+  { name: 'Adam Morgan', role: 'ASSOCIATE, DEVELOPMENT AND INVESTMENTS' },
+  { name: 'Mike Prapavessis', role: 'ASSOCIATE, DEVELOPMENT AND INVESTMENTS', image: mikeP },
+  { name: 'Cole Cameron', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: cole },
+  { name: 'Matthew Sardellitti', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: matt },
+  {
     name: 'Jordan Winter',
-    role: 'VICE PRESIDENT, FINANCE',
+    role: 'VICE PRESIDENT, FINANCE & ACCOUNTING',
     image: jordan,
     bio: '10+ years in corporate finance, real estate, and accounting.',
     education: 'CPA, CA\nMMPA University of Toronto\nBA (Economics), University of Western Ontario',
   },
-  { name: 'Cole Cameron', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: cole },
-  { name: 'Matthew Sardellitti', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: matt },
-  { name: 'Mike Prapavessis', role: 'ANALYST, DEVELOPMENT AND INVESTMENTS', image: mikeP },
+  { name: 'Jude Siby', role: 'SENIOR ACCOUNTANT' },
+  { name: 'Jonathan Graham', role: 'MANAGER, BUILDING PERFORMANCE' },
   { name: 'Dylan Delli Colli', role: 'DATA SCIENCE LEAD', image: dylan },
-  { name: 'Radhika Gurav', role: 'SENIOR CORPORATE ACCOUNTANT', image: radhika },
-  { name: 'Yuliia Voznyak', role: 'MANAGER, PROPERTY ACCOUNTING', image: yulia },
   { name: 'Mike Freeland', role: 'SENIOR PM, CONSTRUCTION', image: mikeFreeland },
+  { name: 'Nic Green', role: '' },
 ]
 
 const HAIRLINE = 'rgba(237, 237, 237, 0.14)'
@@ -310,7 +331,7 @@ function Team() {
                 <Detail $open={isOpen}>
                   <DetailInner>
                     <DetailGrid>
-                      <Portrait $image={m.image} />
+                      {m.image && <Portrait $image={m.image} />}
                       <BioColumn>
                         {m.bio && <Bio>{m.bio}</Bio>}
                         {m.education && (
